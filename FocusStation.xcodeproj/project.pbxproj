@@ -1,0 +1,421 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AAA000000000000000000001 /* FocusStationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000010 /* FocusStationApp.swift */; };
+		AAA000000000000000000002 /* ModelContainer+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000011 /* ModelContainer+App.swift */; };
+		AAA000000000000000000003 /* EnvironmentKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000012 /* EnvironmentKeys.swift */; };
+		AAA000000000000000000004 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000013 /* Task.swift */; };
+		AAA000000000000000000005 /* Day.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000014 /* Day.swift */; };
+		AAA000000000000000000006 /* TimerManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000015 /* TimerManagerProtocol.swift */; };
+		AAA000000000000000000007 /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000016 /* TimerManager.swift */; };
+		AAA000000000000000000008 /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000017 /* TimeFormatter.swift */; };
+		AAA000000000000000000009 /* IconProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000018 /* IconProvider.swift */; };
+
+		AAA000000000000000000038 /* MenuBarLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000039 /* MenuBarLabelView.swift */; };
+		AAA000000000000000000070 /* DropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000071 /* DropdownView.swift */; };
+		AAA000000000000000000072 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000073 /* TaskRowView.swift */; };
+		AAA000000000000000000074 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000075 /* EmptyStateView.swift */; };
+		BBB000000000000000000001 /* DropdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB000000000000000000002 /* DropdownViewModel.swift */; };
+		BBB000000000000000000003 /* AddTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB000000000000000000004 /* AddTaskSheet.swift */; };
+		BBB000000000000000000005 /* TimerManager+SleepWake.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB000000000000000000006 /* TimerManager+SleepWake.swift */; };
+		CCC000000000000000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000002 /* SettingsView.swift */; };
+		CCC000000000000000000003 /* GeneralSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000004 /* GeneralSettingsTab.swift */; };
+		CCC000000000000000000005 /* AppearanceSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000006 /* AppearanceSettingsTab.swift */; };
+		CCC000000000000000000007 /* BehaviorSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000008 /* BehaviorSettingsTab.swift */; };
+		EEE000000000000000000001 /* TickGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000002 /* TickGenerator.swift */; };
+		EEE000000000000000000003 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000004 /* MenuBarController.swift */; };
+		EEE000000000000000000005 /* MenuBarContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000006 /* MenuBarContainerView.swift */; };
+		EEE000000000000000000007 /* StatusBarLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000008 /* StatusBarLabelView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AAA000000000000000000010 /* FocusStationApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusStationApp.swift; sourceTree = "<group>"; };
+		AAA000000000000000000011 /* ModelContainer+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModelContainer+App.swift"; sourceTree = "<group>"; };
+		AAA000000000000000000012 /* EnvironmentKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentKeys.swift; sourceTree = "<group>"; };
+		AAA000000000000000000013 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		AAA000000000000000000014 /* Day.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Day.swift; sourceTree = "<group>"; };
+		AAA000000000000000000015 /* TimerManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManagerProtocol.swift; sourceTree = "<group>"; };
+		AAA000000000000000000016 /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
+		AAA000000000000000000017 /* TimeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
+		AAA000000000000000000018 /* IconProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconProvider.swift; sourceTree = "<group>"; };
+		AAA000000000000000000019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAA000000000000000000020 /* FocusStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+
+		AAA000000000000000000039 /* MenuBarLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabelView.swift; sourceTree = "<group>"; };
+		AAA000000000000000000071 /* DropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownView.swift; sourceTree = "<group>"; };
+		AAA000000000000000000073 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
+		AAA000000000000000000075 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		BBB000000000000000000002 /* DropdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownViewModel.swift; sourceTree = "<group>"; };
+		BBB000000000000000000004 /* AddTaskSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskSheet.swift; sourceTree = "<group>"; };
+		BBB000000000000000000006 /* TimerManager+SleepWake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimerManager+SleepWake.swift"; sourceTree = "<group>"; };
+		CCC000000000000000000002 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CCC000000000000000000004 /* GeneralSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsTab.swift; sourceTree = "<group>"; };
+		CCC000000000000000000006 /* AppearanceSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsTab.swift; sourceTree = "<group>"; };
+		CCC000000000000000000008 /* BehaviorSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorSettingsTab.swift; sourceTree = "<group>"; };
+		EEE000000000000000000002 /* TickGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickGenerator.swift; sourceTree = "<group>"; };
+		EEE000000000000000000004 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		EEE000000000000000000006 /* MenuBarContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContainerView.swift; sourceTree = "<group>"; };
+		EEE000000000000000000008 /* StatusBarLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarLabelView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		AAA000000000000000000021 /* = */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000022 /* FocusStation */,
+				AAA000000000000000000030 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000022 /* FocusStation */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000023 /* App */,
+				AAA000000000000000000024 /* Models */,
+				AAA000000000000000000025 /* Services */,
+				AAA000000000000000000028 /* ViewModels */,
+				AAA000000000000000000029 /* Views */,
+				AAA000000000000000000026 /* Utilities */,
+				AAA000000000000000000027 /* Resources */,
+			);
+			path = FocusStation;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000023 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000010 /* FocusStationApp.swift */,
+				AAA000000000000000000011 /* ModelContainer+App.swift */,
+				AAA000000000000000000012 /* EnvironmentKeys.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000024 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000013 /* Task.swift */,
+				AAA000000000000000000014 /* Day.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000025 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000015 /* TimerManagerProtocol.swift */,
+				AAA000000000000000000016 /* TimerManager.swift */,
+				BBB000000000000000000006 /* TimerManager+SleepWake.swift */,
+				EEE000000000000000000002 /* TickGenerator.swift */,
+				EEE000000000000000000004 /* MenuBarController.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000026 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000017 /* TimeFormatter.swift */,
+				AAA000000000000000000018 /* IconProvider.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000027 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000019 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000028 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				BBB000000000000000000002 /* DropdownViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000029 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000031 /* MenuBar */,
+				AAA000000000000000000076 /* Dropdown */,
+				CCC000000000000000000009 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000030 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000020 /* FocusStation.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000031 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000039 /* MenuBarLabelView.swift */,
+				EEE000000000000000000006 /* MenuBarContainerView.swift */,
+				EEE000000000000000000008 /* StatusBarLabelView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		AAA000000000000000000076 /* Dropdown */ = {
+			isa = PBXGroup;
+			children = (
+				AAA000000000000000000071 /* DropdownView.swift */,
+				AAA000000000000000000073 /* TaskRowView.swift */,
+				AAA000000000000000000075 /* EmptyStateView.swift */,
+				BBB000000000000000000004 /* AddTaskSheet.swift */,
+			);
+			path = Dropdown;
+			sourceTree = "<group>";
+		};
+		CCC000000000000000000009 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				CCC000000000000000000002 /* SettingsView.swift */,
+				CCC000000000000000000004 /* GeneralSettingsTab.swift */,
+				CCC000000000000000000006 /* AppearanceSettingsTab.swift */,
+				CCC000000000000000000008 /* BehaviorSettingsTab.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AAA000000000000000000040 /* FocusStation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAA000000000000000000045 /* Build configuration list for PBXNativeTarget "FocusStation" */;
+			buildPhases = (
+				AAA000000000000000000041 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FocusStation;
+			productName = FocusStation;
+			productReference = AAA000000000000000000020 /* FocusStation.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAA000000000000000000050 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					AAA000000000000000000040 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+				};
+			};
+			buildConfigurationList = AAA000000000000000000044 /* Build configuration list for PBXProject "FocusStation" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AAA000000000000000000021 /* = */;
+			productRefGroup = AAA000000000000000000030 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AAA000000000000000000040 /* FocusStation */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AAA000000000000000000041 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA000000000000000000001 /* FocusStationApp.swift in Sources */,
+				AAA000000000000000000002 /* ModelContainer+App.swift in Sources */,
+				AAA000000000000000000003 /* EnvironmentKeys.swift in Sources */,
+				AAA000000000000000000004 /* Task.swift in Sources */,
+				AAA000000000000000000005 /* Day.swift in Sources */,
+				AAA000000000000000000006 /* TimerManagerProtocol.swift in Sources */,
+				AAA000000000000000000007 /* TimerManager.swift in Sources */,
+				AAA000000000000000000008 /* TimeFormatter.swift in Sources */,
+				AAA000000000000000000009 /* IconProvider.swift in Sources */,
+				AAA000000000000000000038 /* MenuBarLabelView.swift in Sources */,
+				AAA000000000000000000070 /* DropdownView.swift in Sources */,
+				AAA000000000000000000072 /* TaskRowView.swift in Sources */,
+				AAA000000000000000000074 /* EmptyStateView.swift in Sources */,
+				BBB000000000000000000001 /* DropdownViewModel.swift in Sources */,
+				BBB000000000000000000003 /* AddTaskSheet.swift in Sources */,
+				BBB000000000000000000005 /* TimerManager+SleepWake.swift in Sources */,
+				CCC000000000000000000001 /* SettingsView.swift in Sources */,
+				CCC000000000000000000003 /* GeneralSettingsTab.swift in Sources */,
+				CCC000000000000000000005 /* AppearanceSettingsTab.swift in Sources */,
+				CCC000000000000000000007 /* BehaviorSettingsTab.swift in Sources */,
+				EEE000000000000000000001 /* TickGenerator.swift in Sources */,
+				EEE000000000000000000003 /* MenuBarController.swift in Sources */,
+				EEE000000000000000000005 /* MenuBarContainerView.swift in Sources */,
+				EEE000000000000000000007 /* StatusBarLabelView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AAA000000000000000000060 /* Debug - Project */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		AAA000000000000000000061 /* Release - Project */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AAA000000000000000000062 /* Debug - Target */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "FocusStation/Resources/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focusstation.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		AAA000000000000000000063 /* Release - Target */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "FocusStation/Resources/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focusstation.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AAA000000000000000000044 /* Build configuration list for PBXProject "FocusStation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAA000000000000000000060 /* Debug - Project */,
+				AAA000000000000000000061 /* Release - Project */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAA000000000000000000045 /* Build configuration list for PBXNativeTarget "FocusStation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAA000000000000000000062 /* Debug - Target */,
+				AAA000000000000000000063 /* Release - Target */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = AAA000000000000000000050 /* Project object */;
+}

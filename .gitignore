@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+Thumbs.db
+
+# Xcode
+*.xcuserdata
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+*.xcodeproj/xcuserdata
+*.xcodeproj/xcshareddata/xcschemes/xcschememanagement.plist
+
+# Build
+*.build/
+*.app
+*.ipa
+*.dmg
+*.pkg
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/test_output
+
+# IDE
+*.bak
+*.swp
+*~
+
+# FocusStation specific
+*.timeline
+*.trace
+Instruments/
