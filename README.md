@@ -19,8 +19,6 @@ FocusStation lives in your Mac's menu bar. Add tasks, start a timer, and your pr
 ## Screenshots
 
 <p align="center">
-  <img src="docs/focusStation_Desktop_View.png" alt="Desktop View" width="400">
-  &nbsp;
   <img src="docs/focusStation_Focus_View.png" alt="Focus View" width="400">
 </p>
 
