@@ -16,6 +16,14 @@ FocusStation lives in your Mac's menu bar. Add tasks, start a timer, and your pr
 
 ---
 
+## Install
+
+1. Download `FocusStation-v0.1.0.zip` from [Releases](https://github.com/gaju91/focusStation/releases)
+2. Unzip and drag `FocusStation.app` to `/Applications`
+3. **First launch:** right-click → **Open** (ad-hoc signed — Gatekeeper requires this once)
+
+---
+
 ## Screenshots
 
 <p align="center">
@@ -24,7 +32,17 @@ FocusStation lives in your Mac's menu bar. Add tasks, start a timer, and your pr
 
 ---
 
-## Getting Started
+## Usage
+
+- **Add a task:** click "Add Task", type a name, set optional target hours/minutes, hit Save
+- **Start tracking:** click ▶ on any task — only one timer runs at a time
+- **Menu bar glance:** active task name + elapsed / target visible without opening the popover
+- **Edit inline:** hover a row → pencil icon → edit name or target
+- **Reorder:** drag rows via the handle
+
+---
+
+## Development
 
 ### Requirements
 - macOS 14 (Sonoma) or later
@@ -39,6 +57,50 @@ open ~/Library/Developer/Xcode/DerivedData/FocusStation-*/Build/Products/Debug/F
 ```
 
 **That's it.** Zero dependencies. Zero package managers. Zero third-party code.
+
+### Release
+
+Follow these steps to create a distributable ZIP. Each step builds on the previous one.
+
+**1. Build the Release version of the app**
+
+This compiles the app with optimizations (no debug symbols).
+
+```bash
+xcodebuild -project FocusStation.xcodeproj -scheme FocusStation -configuration Release build
+```
+
+The compiled `.app` bundle lands at `build/Release/FocusStation.app`.
+
+**2. Package as a ZIP**
+
+This creates a single compressed file you can share. `ditto` preserves macOS metadata (permissions, code signature) which plain `zip` would strip.
+
+```bash
+ditto -c -k --keepParent build/Release/FocusStation.app FocusStation-v0.1.0.zip
+```
+
+Replace `v0.1.0` with the current version number.
+
+**3. Tag the release**
+
+This marks a point in Git history. Use [semantic versioning](https://semver.org): `MAJOR.MINOR.PATCH`. For example, `v0.1.0` for the first release, `v0.1.1` for a bug fix, `v0.2.0` for new features.
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+**4. Upload to GitHub**
+
+Go to [GitHub Releases](https://github.com/gaju91/focusStation/releases) → "Draft a new release":
+- **Tag:** select the tag you just pushed (e.g., `v0.1.0`)
+- **Title:** `FocusStation v0.1.0`
+- **Description:** a brief list of changes since the last release
+- **Attach:** drag the `.zip` file you created in step 2
+- Click **Publish release**
+
+The ZIP is now publicly downloadable from the Releases page — anyone can install from `## Install` above.
 
 ---
 
@@ -237,6 +299,17 @@ grep -rn 'UserDefaults.standard.set\|UserDefaults.standard.removeObject' FocusSt
 - `///` doc comments on every public type, method, and property
 - ViewModels import `Observation` (not `SwiftUI`)
 - Views import `SwiftUI` (and `AppKit` only when needed)
+
+---
+
+## Troubleshooting
+
+| Issue | Fix |
+|---|---|
+| **"Cannot be opened because the developer cannot be verified"** | Right-click the app → Open, or run `xattr -cr /Applications/FocusStation.app` in Terminal |
+| **App doesn't appear in menu bar** | Ensure the app is in `/Applications`. If your menu bar is crowded, the icon may be hidden — try closing other menu bar items or use [Bartender](https://www.macbartender.com) |
+| **Timers not counting** | Click ▶ on a task to start the timer. Only one timer runs at a time — starting another pauses the current one |
+| **Tasks disappeared after restart** | Tasks persist via SwiftData — ensure the app quits normally (not force-quit) |
 
 ---
 
