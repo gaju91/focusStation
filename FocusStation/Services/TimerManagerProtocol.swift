@@ -16,6 +16,6 @@ protocol TimerManagerProtocol: AnyObject {
     func updateIcon(of task: Task, to iconName: String)
     func updateTargetTime(of task: Task, to targetTime: TimeInterval?)
     func move(task: Task, to index: Int)
-    func swapTasks(_ a: Task, with b: Task)
+    func reorderTasks(_ tasks: [Task])
     func clearAllData()
 }

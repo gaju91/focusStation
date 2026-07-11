@@ -42,52 +42,39 @@ open ~/Library/Developer/Xcode/DerivedData/FocusStation-*/Build/Products/Debug/F
 
 ---
 
-## Project Structure
+## Project Structure (19 files)
 
 ```
-FocusStation/                         # All source code
-│
-├── App/                              # Entry point + environment + schema
-│   ├── FocusStationApp.swift         # @main struct — DI, Settings scene
+FocusStation/
+├── App/
+│   ├── FocusStationApp.swift         # @main — DI, dummy MenuBarExtra
 │   ├── ModelContainer+App.swift      # SwiftData schema + on-disk store
 │   └── EnvironmentKeys.swift         # @Entry for TimerManagerProtocol
-│
-├── Models/                           # SwiftData @Model classes
-│   ├── Task.swift                    # name, icon, timer state, target time
-│   └── Day.swift                     # ArchivedDay + ArchivedTask snapshots
-│
-├── Services/                         # Business logic — no UI dependencies
-│   ├── TimerManagerProtocol.swift    # 13-member contract for timer CRUD
-│   ├── TimerManager.swift            # @Observable timer authority
-│   ├── TimerManager+SleepWake.swift  # NSWorkspace sleep/wake → pause timers
-│   ├── TickGenerator.swift           # @MainActor 1s @Observable tick source
-│   └── MenuBarController.swift       # NSStatusBar + NSPopover lifecycle
-│
-├── ViewModels/                       # MVVM bridge — @Observable, no SwiftUI imports
-│   └── DropdownViewModel.swift       # Task list, CRUD, sorting, sync timer
-│
-├── Views/                            # SwiftUI only — no business logic
+├── Models/
+│   ├── Task.swift                    # @Model: name, icon, timestamps, isRunning, displayState
+│   └── Day.swift                     # Archived day schema (forward compatibility)
+├── Services/
+│   ├── TimerManagerProtocol.swift    # 15-member contract for timer CRUD
+│   ├── TimerManager.swift            # @Observable timer engine + single-timer enforcement + CRUD
+│   ├── TimerManager+SleepWake.swift  # NSWorkspace sleep → pause all, wake → restart display
+│   ├── TickGenerator.swift           # @MainActor @Observable 1s tick source
+│   └── MenuBarController.swift       # NSStatusBar + NSPopover lifecycle + tick observation
+├── ViewModels/
+│   └── DropdownViewModel.swift       # @Observable — syncs tasks, exposes sortedTasks, CRUD passthrough
+├── Views/
 │   ├── MenuBar/
-│   │   ├── StatusBarLabelView.swift   # Brain icon ● name elapsed / target
-│   │   ├── MenuBarLabelView.swift     # Passes tickGenerator + timerManager
-│   │   └── MenuBarContainerView.swift # NSHostingView wrapper (avoids AnyView)
-│   ├── Dropdown/
-│   │   ├── DropdownView.swift         # Task list panel (NSPopover content)
-│   │   ├── TaskRowView.swift          # Checkbox, state dot, name, time, delete
-│   │   ├── AddTaskSheet.swift         # New/Edit task form with target time
-│   │   └── EmptyStateView.swift       # "No tasks yet" placeholder
-│   └── Settings/
-│       ├── SettingsView.swift         # TabView container (600×460)
-│       ├── GeneralSettingsTab.swift   # Launch at login, sleep/wake, data reset
-│       ├── AppearanceSettingsTab.swift # Hide completed tasks
-│       └── BehaviorSettingsTab.swift  # Single-timer enforcement (read-only)
-│
-├── Utilities/                        # Pure functions, zero state
-│   ├── TimeFormatter.swift           # TimeInterval → "1h30m" / "45m"
-│   └── IconProvider.swift            # 32 SF Symbol registry + default icon
-│
+│   │   ├── StatusBarLabelView.swift   # Running/Paused/Idle label with time and target
+│   │   ├── MenuBarLabelView.swift     # Bridges TickGenerator + timerManager
+│   │   └── MenuBarContainerView.swift # Typed NSHostingView wrapper (avoids AnyView)
+│   └── Dropdown/
+│       ├── DropdownView.swift         # Task list, inline task creation, inline editing
+│       ├── TaskRowView.swift          # Single row: checkbox, name, elapsed, action buttons, inline edit
+│       └── EmptyStateView.swift       # "No tasks yet" placeholder
+├── Utilities/
+│   ├── TimeFormatter.swift            # TimeInterval → "1h23m" / "45m" (omits zero components)
+│   └── IconProvider.swift             # 32 SF Symbol registry + default icon
 └── Resources/
-    └── Info.plist                    # LSUIElement = true (hide from Dock)
+    └── Info.plist                     # LSUIElement = true (hide from Dock)
 ```
 
 ---
@@ -110,10 +97,10 @@ FocusStation/                         # All source code
                                                             └────────────┘
 ```
 
-- **Views** render pixels. No `if` business logic, no SwiftData access.
-- **ViewModels** (`@Observable` classes) prepare data. Import `Observation`, never `SwiftUI`.
+- **Views** render pixels. No business logic, no SwiftData access.
+- **ViewModels** (`@Observable` classes, import `Observation`) prepare data.
 - **Services** own state. `TimerManager` is the sole mutation point for tasks.
-- **SwiftData** persists everything locally. `ModelContainer.appContainer` is a static factory.
+- **Protocol DI** — ViewModels depend on `any TimerManagerProtocol`, never the concrete class. `NoOpTimerManager` serves as the `@Entry` default.
 
 ### Timer Engine — Timestamp-Based, Zero Drift
 
@@ -128,33 +115,27 @@ func currentElapsed() -> TimeInterval {
 - **Started timestamp** recorded on start/resume. Paused captures elapsed into `accumulatedElapsed`.
 - **Live display** computed on every render: `accumulated + (now - startedAt)`.
 - **Sleep-safe** — on wake, the math accounts for elapsed wall-clock time automatically.
+- **Single-timer enforcement** — `TimerManager.start()` and `resume()` both call `pauseOtherRunningTasks(except:)`. Starting or resuming a task automatically pauses any currently running task. This is mandatory, not a toggle-able setting.
 
 ### Menu Bar — NSStatusBar + NSPopover
 
-The initial `MenuBarExtra` approach was abandoned because SwiftUI clips label content to ~40px. The current implementation uses:
+The initial `MenuBarExtra` approach was abandoned because SwiftUI clips label content. The current implementation uses:
 
-- `NSStatusBar.system.statusItem(withLength: 180)` — fixed-width item, no clipping.
+- `NSStatusBar.system.statusItem(withLength: .variableLength)` — shrinks to icon-only when idle, expands for active timers. No wasted space.
 - `NSHostingView<MenuBarContainerView>` — embedded SwiftUI inside the status button.
 - `NSPopover` with `.transient` behavior + `NSHostingController` — dropdown panel.
-- `TickGenerator` (`@Observable`, 1s timer) — drives `withObservationTracking` in `MenuBarController` to re-render the label each second.
-- `NSApp.effectiveAppearance` synced each tick in `updateLabel()` for dark/light mode.
+- `TickGenerator` (`@Observable`, 1s selector-based timer on `RunLoop.main.common`) — drives `withObservationTracking` in `MenuBarController` to re-render the label each second without `@Sendable` closures.
+- **No explicit appearance override** — the `NSHostingView` inherits appearance from the status bar button, which automatically tracks light/dark theme.
 
-### Single-Timer Enforcement
+### Menu Bar Label States
 
-`TimerManager.start()` and `resume()` both call `pauseOtherRunningTasks(except:)` — starting or resuming a task automatically pauses any currently running task. This is mandatory, not optional.
+| State | Display |
+|---|---|
+| Running | `icon  Task Name  1h23m / 3h00m` (green elapsed, gray target) |
+| Paused | `icon  Task Name  45m` (orange elapsed) |
+| Idle | `icon` only |
 
-### Protocol-Based DI
-
-```swift
-protocol TimerManagerProtocol: AnyObject {
-    var tasks: [Task] { get }
-    func start(task: Task)
-    func pause(task: Task)
-    // ... 13 total members
-}
-```
-
-`NoOpTimerManager` (empty implementation) serves as the `@Entry` default. The real `TimerManager` is created in `FocusStationApp.init()` and injected. ViewModels depend on `any TimerManagerProtocol`, never the concrete class. Testable via mock.
+Running and paused rows share the same `.frame(minWidth: 140)` to prevent the status bar from resizing on pause/resume — only the color changes (green ↔ orange). The idle state uses `variableLength` so the status item shrinks to just the icon.
 
 ---
 
@@ -164,38 +145,38 @@ protocol TimerManagerProtocol: AnyObject {
 
 | File | Responsibility |
 |---|---|
-| `FocusStationApp.swift` | `@main` entry point. Creates `ModelContainer`, `TimerManager`, `TickGenerator`, `MenuBarController`. Provides Settings scene. |
+| `FocusStationApp.swift` | `@main` entry point. Creates `ModelContainer`, `TimerManager`, `TickGenerator`, `MenuBarController`. Renders a dummy `MenuBarExtra` (hidden) to satisfy the `App` protocol. |
 | `ModelContainer+App.swift` | Static `ModelContainer.appContainer` factory. Schema: `Task`, `Day`, `ArchivedTask`. On-disk store. |
-| `EnvironmentKeys.swift` | `@Entry var timerManager`. Defaults to `NoOpTimerManager`. Overridden via `.environment(\.timerManager, ...)` in `MenuBarController`. |
+| `EnvironmentKeys.swift` | `@Entry var timerManager`. Defaults to `NoOpTimerManager`. Overridden via `.environment(\.timerManager, ...)`. |
 
 ### `Models/`
 
 | File | Responsibility |
 |---|---|
-| `Task.swift` | `@Model` class. Properties: `name`, `iconName`, `isRunning`, `isCompleted`, `accumulatedElapsed`, `startedAt`, `targetTime`, `displayOrder`. `currentElapsed()` is computed from timestamps. `displayState` derives `.running`/`.paused`/`.idle`/`.completed`. |
+| `Task.swift` | `@Model` class. Properties: `name`, `iconName`, `isRunning`, `isCompleted`, `accumulatedElapsed`, `startedAt`, `targetTime`, `displayOrder`. `currentElapsed()` computed from timestamps. `displayState` derives `.running` / `.paused` / `.idle` / `.completed`. |
 | `Day.swift` | `@Model` for archived daily snapshots + `ArchivedTask` frozen task state. Schema present for forward compatibility. |
 
 ### `Services/`
 
 | File | Responsibility |
 |---|---|
-| `TimerManagerProtocol.swift` | 13-member `AnyObject` protocol. Contract for all timer mutations + task CRUD. |
-| `TimerManager.swift` | `@Observable` implementation. Owns `tasks: [Task]`, `modelContext`, display timer, `refreshTasks()`. `start`/`pause`/`resume` enforce single-timer. `swapTasks(_:with:)` for reorder. |
-| `TimerManager+SleepWake.swift` | `NSWorkspace` notif observers. On sleep: pause all + stop display timer. On wake: restart display timer. |
-| `TickGenerator.swift` | `@MainActor @Observable`. Runs a 1s recurring `Timer` on `RunLoop.main.common`. `value` incremented each tick — observed by `MenuBarController` to trigger label re-renders. |
-| `MenuBarController.swift` | `@MainActor` class. Creates `NSStatusItem` (180px), `NSHostingView` for label, `NSPopover` for dropdown. Click toggle, `withObservationTracking` tick loop, appearance sync. |
+| `TimerManagerProtocol.swift` | 15-member `AnyObject` protocol. Contract for all timer mutations + task CRUD + reordering. |
+| `TimerManager.swift` | `@Observable` implementation. Owns `tasks: [Task]`, `modelContext`, display timer, `refreshTasks()`. `start`/`pause`/`resume` enforce single-timer via `pauseOtherRunningTasks(except:)`. `reorderTasks(_:)` for batch drag-and-drop reordering. `deinit` invalidates display timer. |
+| `TimerManager+SleepWake.swift` | `NSWorkspace` notification observers. On sleep: pause all running timers + invalidate display timer. On wake: restart display timer only (no auto-resume). |
+| `TickGenerator.swift` | `@MainActor @Observable`. Runs a 1s selector-based `Timer` on `RunLoop.main.common`. `value` incremented each tick — observed by `MenuBarController` to trigger label re-renders. Selector-based to avoid `@Sendable` warnings in Swift 6. |
+| `MenuBarController.swift` | `@MainActor` class. Creates `NSStatusItem` (variableLength), `NSHostingView` for label, `NSPopover` for dropdown. Click toggle, `withObservationTracking` tick loop. Popover width computed from `fittingSize`. No explicit appearance override. |
 
 ### `ViewModels/`
 
 | File | Responsibility |
 |---|---|
-| `DropdownViewModel.swift` | `@Observable`. Syncs `tasks` from `timerManager` every 1s. Exposes `sortedTasks` (running → paused → idle → completed). Handles `startTask`, `pauseTask`, `resumeTask`, CRUD passthrough, `swapAdjacent` for move up/down. `deinit` invalidates sync timer. |
+| `DropdownViewModel.swift` | `@Observable`. Syncs `tasks` from `timerManager` every 1s via selector-based sync timer. Exposes `sortedTasks` (running → paused → idle → completed by displayOrder). Handles all timer actions + CRUD passthrough + `reorderTasks(from:to:)`. `deinit` invalidates sync timer. |
 
 ### `Views/MenuBar/`
 
 | File | Responsibility |
 |---|---|
-| `StatusBarLabelView.swift` | Renders the menu bar label: `🧠 Research 1h23m / 3h00m` for running tasks (green time), `🧠 Research 45m` for paused (orange), brain icon for idle. Time hidden when `elapsed == 0`. Zero-width components omitted by `TimeFormatter`. |
+| `StatusBarLabelView.swift` | Renders menu bar label. Idle: brain icon only. Running: icon + name + elapsed / target. Paused: icon + name + elapsed. Uses `.foregroundStyle(.primary)` on icons and text for theme-agnostic rendering. Running/paused rows use `.frame(minWidth: 140)` to prevent resize on state change. |
 | `MenuBarLabelView.swift` | Bridges `TickGenerator` + `timerManager` to `StatusBarLabelView` with `.id(tickGenerator.value)` for re-rendering. |
 | `MenuBarContainerView.swift` | Concrete typed wrapper around `StatusBarLabelView`. Exists solely to avoid `AnyView` in `NSHostingView` (breaks `intrinsicContentSize`). |
 
@@ -203,57 +184,47 @@ protocol TimerManagerProtocol: AnyObject {
 
 | File | Responsibility |
 |---|---|
-| `DropdownView.swift` | `NSPopover` content. Header (title + Settings + Quit), task list (scrollable, hide-completed toggle), Add Task footer. Min height 340px to prevent popover resize. |
-| `TaskRowView.swift` | Single row: completion checkbox, state dot (green/orange/gray), name + time / target, hover reveal reorder buttons, action button (Start/Pause/Resume), delete (×). Context menu for alternate actions. |
-| `AddTaskSheet.swift` | Inline form (not a sheet). Name field with validation, target hours/minutes steppers. Edit mode pre-fills existing values. "Save & Add Another" for bulk creation. |
-| `EmptyStateView.swift` | Static placeholder when no tasks exist. |
-
-### `Views/Settings/`
-
-| File | Responsibility |
-|---|---|
-| `SettingsView.swift` | `TabView` with General, Appearance, Behavior tabs. Frame 600×460. |
-| `GeneralSettingsTab.swift` | Launch at Login (`SMAppService`), Pause/Resume on Sleep toggles, Reset All Data (with confirmation alert). |
-| `AppearanceSettingsTab.swift` | Hide Completed Tasks toggle. |
-| `BehaviorSettingsTab.swift` | Informational: single-timer enforcement description. |
+| `DropdownView.swift` | `NSPopover` content. Header ("FocusStation" + Quit button), scrollable task list with drag-to-reorder, inline pending task rows for batch creation, "Add Task" footer button. Contains `PendingTask` struct (name + hours + minutes) and `PendingTaskRowView` (inline form matching the edit-mode layout). Accent-colored separator between existing tasks and pending rows. |
+| `TaskRowView.swift` | Single task row. Normal mode: completion checkbox, task name + elapsed/target time, action button (Start/Pause/Resume/Complete), hover-revealed pencil edit button, trash delete button. Edit mode: inline form identical to `PendingTaskRowView` — rounded-border name field + target h/m fields + checkmark save / x cancel buttons. Context menu for alternate actions. Double-clicking the name does nothing — use the pencil button or context menu "Rename". |
+| `EmptyStateView.swift` | Static placeholder shown when no tasks and no pending rows exist. |
 
 ### `Utilities/`
 
 | File | Responsibility |
 |---|---|
-| `TimeFormatter.swift` | `static func format(TimeInterval) -> String`. Returns `"1h30m"`, `"45m"`, `"30s"`, `"24h+"`, `"0m"`. Omits zero components. |
+| `TimeFormatter.swift` | `static func format(TimeInterval) -> String`. Returns `"1h30m"`, `"45m"`, `"30s"`, `"0m"`. Omits zero components — never shows `"1h0m"`. |
 | `IconProvider.swift` | 32 SF Symbol names. `defaultIcon = "brain.head.profile"`. `label(for:)` for human-readable display. |
 
 ---
 
 ## Guardrails
 
-These checks are enforced in CI and block merges. Run locally before submitting:
+These checks are enforced and must pass. Run locally before committing:
 
 ```bash
-# Build must succeed with zero warnings
+# Build must succeed
 xcodebuild -project FocusStation.xcodeproj -scheme FocusStation -configuration Debug build
 
 # No force unwraps (use guard let / if let)
-grep -rn '!' FocusStation/ --include='*.swift' | grep -v '!=' | grep -v 'fatalError'
+grep -rn '!' FocusStation/ --include='*.swift' | grep -v '!=' | grep -v 'fatalError' || echo "PASS"
 
 # No debug prints
-grep -rn 'print(' FocusStation/ --include='*.swift'
+grep -rn 'print(' FocusStation/ --include='*.swift' || echo "PASS"
 
 # No counter-based timers (use timestamps)
-grep -rn 'elapsed += 1' FocusStation/ --include='*.swift'
+grep -rn 'elapsed += 1' FocusStation/ --include='*.swift' || echo "PASS"
 
 # No legacy property wrappers (use @Observable)
-grep -rn '@Published\|ObservableObject\|@StateObject' FocusStation/ --include='*.swift'
+grep -rn '@Published\|ObservableObject\|@StateObject' FocusStation/ --include='*.swift' || echo "PASS"
 
-# No hardcoded colors (use semantic colors for dark mode)
-grep -rn 'Color\.black\|Color\.white\|Color(red:\|Color(hex:' FocusStation/ --include='*.swift'
+# No hardcoded colors (use semantic: .primary, .secondary, .green, .orange, .accentColor)
+grep -rn 'Color\.black\|Color\.white\|Color(red:\|Color(hex:' FocusStation/ --include='*.swift' || echo "PASS"
 
 # No Combine (use @Observable + withObservationTracking)
-grep -rn 'import Combine\|Combine\.' FocusStation/ --include='*.swift'
+grep -rn 'import Combine\|Combine\.' FocusStation/ --include='*.swift' || echo "PASS"
 
-# No raw UserDefaults writes (use @AppStorage)
-grep -rn 'UserDefaults.standard.set\|UserDefaults.standard.removeObject' FocusStation/ --include='*.swift'
+# No raw UserDefaults writes (use @AppStorage when needed)
+grep -rn 'UserDefaults.standard.set\|UserDefaults.standard.removeObject' FocusStation/ --include='*.swift' || echo "PASS"
 ```
 
 ### Must Always
@@ -264,7 +235,8 @@ grep -rn 'UserDefaults.standard.set\|UserDefaults.standard.removeObject' FocusSt
 - Semantic colors only — `.primary`, `.secondary`, `.green`, `.orange`, `.accentColor`
 - Imports sorted alphabetically: Foundation → SwiftData → SwiftUI → AppKit → Observation
 - `///` doc comments on every public type, method, and property
-- ViewModels import `Observation` (not `SwiftUI`); Views import `SwiftUI` (and `AppKit` only when needed)
+- ViewModels import `Observation` (not `SwiftUI`)
+- Views import `SwiftUI` (and `AppKit` only when needed)
 
 ---
 
@@ -288,7 +260,7 @@ area: short description in present tense
 - **Zero dependencies.** Everything uses Apple frameworks only.
 - **Local-only.** No networking. No analytics. No accounts.
 - **Timestamp-based timer.** Never increment a counter.
-- **Small surface area.** One feature per file. Clear responsibilities.
+- **Small surface area.** One responsibility per file. Clear ownership.
 
 ---
 

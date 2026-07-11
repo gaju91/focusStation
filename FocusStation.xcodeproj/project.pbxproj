@@ -22,12 +22,8 @@
 		AAA000000000000000000072 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000073 /* TaskRowView.swift */; };
 		AAA000000000000000000074 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000075 /* EmptyStateView.swift */; };
 		BBB000000000000000000001 /* DropdownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB000000000000000000002 /* DropdownViewModel.swift */; };
-		BBB000000000000000000003 /* AddTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB000000000000000000004 /* AddTaskSheet.swift */; };
 		BBB000000000000000000005 /* TimerManager+SleepWake.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB000000000000000000006 /* TimerManager+SleepWake.swift */; };
-		CCC000000000000000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000002 /* SettingsView.swift */; };
-		CCC000000000000000000003 /* GeneralSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000004 /* GeneralSettingsTab.swift */; };
-		CCC000000000000000000005 /* AppearanceSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000006 /* AppearanceSettingsTab.swift */; };
-		CCC000000000000000000007 /* BehaviorSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC000000000000000000008 /* BehaviorSettingsTab.swift */; };
+
 		EEE000000000000000000001 /* TickGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000002 /* TickGenerator.swift */; };
 		EEE000000000000000000003 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000004 /* MenuBarController.swift */; };
 		EEE000000000000000000005 /* MenuBarContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000006 /* MenuBarContainerView.swift */; };
@@ -52,12 +48,8 @@
 		AAA000000000000000000073 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
 		AAA000000000000000000075 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		BBB000000000000000000002 /* DropdownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownViewModel.swift; sourceTree = "<group>"; };
-		BBB000000000000000000004 /* AddTaskSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskSheet.swift; sourceTree = "<group>"; };
 		BBB000000000000000000006 /* TimerManager+SleepWake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimerManager+SleepWake.swift"; sourceTree = "<group>"; };
-		CCC000000000000000000002 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		CCC000000000000000000004 /* GeneralSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsTab.swift; sourceTree = "<group>"; };
-		CCC000000000000000000006 /* AppearanceSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsTab.swift; sourceTree = "<group>"; };
-		CCC000000000000000000008 /* BehaviorSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorSettingsTab.swift; sourceTree = "<group>"; };
+
 		EEE000000000000000000002 /* TickGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickGenerator.swift; sourceTree = "<group>"; };
 		EEE000000000000000000004 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		EEE000000000000000000006 /* MenuBarContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContainerView.swift; sourceTree = "<group>"; };
@@ -148,7 +140,6 @@
 			children = (
 				AAA000000000000000000031 /* MenuBar */,
 				AAA000000000000000000076 /* Dropdown */,
-				CCC000000000000000000009 /* Settings */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -177,22 +168,12 @@
 				AAA000000000000000000071 /* DropdownView.swift */,
 				AAA000000000000000000073 /* TaskRowView.swift */,
 				AAA000000000000000000075 /* EmptyStateView.swift */,
-				BBB000000000000000000004 /* AddTaskSheet.swift */,
 			);
 			path = Dropdown;
 			sourceTree = "<group>";
 		};
-		CCC000000000000000000009 /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				CCC000000000000000000002 /* SettingsView.swift */,
-				CCC000000000000000000004 /* GeneralSettingsTab.swift */,
-				CCC000000000000000000006 /* AppearanceSettingsTab.swift */,
-				CCC000000000000000000008 /* BehaviorSettingsTab.swift */,
-			);
-			path = Settings;
-			sourceTree = "<group>";
-		};
+
+
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -263,12 +244,8 @@
 				AAA000000000000000000072 /* TaskRowView.swift in Sources */,
 				AAA000000000000000000074 /* EmptyStateView.swift in Sources */,
 				BBB000000000000000000001 /* DropdownViewModel.swift in Sources */,
-				BBB000000000000000000003 /* AddTaskSheet.swift in Sources */,
 				BBB000000000000000000005 /* TimerManager+SleepWake.swift in Sources */,
-				CCC000000000000000000001 /* SettingsView.swift in Sources */,
-				CCC000000000000000000003 /* GeneralSettingsTab.swift in Sources */,
-				CCC000000000000000000005 /* AppearanceSettingsTab.swift in Sources */,
-				CCC000000000000000000007 /* BehaviorSettingsTab.swift in Sources */,
+	
 				EEE000000000000000000001 /* TickGenerator.swift in Sources */,
 				EEE000000000000000000003 /* MenuBarController.swift in Sources */,
 				EEE000000000000000000005 /* MenuBarContainerView.swift in Sources */,

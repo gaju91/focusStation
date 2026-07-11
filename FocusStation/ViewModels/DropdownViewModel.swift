@@ -4,7 +4,6 @@ import Observation
 @Observable
 final class DropdownViewModel {
     var tasks: [Task] = []
-    var taskToEdit: Task?
 
     var isEmpty: Bool { tasks.isEmpty }
 
@@ -92,16 +91,18 @@ final class DropdownViewModel {
         refreshTasks()
     }
 
-    func moveTaskUp(_ task: Task) {
-        swapAdjacent(task, offset: -1)
+    func reorderTasks(from source: IndexSet, to destination: Int) {
+        var sorted = sortedTasks
+        sorted.move(fromOffsets: source, toOffset: destination)
+        timerManager.reorderTasks(sorted)
+        refreshTasks()
     }
 
-    func moveTaskDown(_ task: Task) {
-        swapAdjacent(task, offset: 1)
-    }
-
-    func moveTask(_ task: Task, to index: Int) {
-        timerManager.move(task: task, to: index)
+    func reorderTask(from sourceIndex: Int, to destinationIndex: Int) {
+        var sorted = sortedTasks
+        let task = sorted.remove(at: sourceIndex)
+        sorted.insert(task, at: destinationIndex)
+        timerManager.reorderTasks(sorted)
         refreshTasks()
     }
 
@@ -121,15 +122,6 @@ final class DropdownViewModel {
     }
 
     // MARK: Private
-
-    private func swapAdjacent(_ task: Task, offset: Int) {
-        let sorted = sortedTasks
-        guard let idx = sorted.firstIndex(where: { $0.id == task.id }) else { return }
-        let targetIdx = idx + offset
-        guard targetIdx >= 0, targetIdx < sorted.count else { return }
-        timerManager.swapTasks(task, with: sorted[targetIdx])
-        refreshTasks()
-    }
 
     private func displayStateOrder(_ state: Task.DisplayState) -> Int {
         switch state {

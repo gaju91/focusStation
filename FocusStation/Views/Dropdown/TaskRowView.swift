@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// A single task row in the dropdown panel.
 struct TaskRowView: View {
     let task: Task
     let onStart: (Task) -> Void
@@ -8,138 +7,132 @@ struct TaskRowView: View {
     let onResume: (Task) -> Void
     let onComplete: (Task) -> Void
     let onUncomplete: (Task) -> Void
-    let onEdit: ((Task) -> Void)?
+    let onRename: ((Task, String) -> Void)?
+    let onUpdateTarget: ((Task, TimeInterval?) -> Void)?
     let onDelete: ((Task) -> Void)?
-    let onMoveUp: ((Task) -> Void)?
-    let onMoveDown: ((Task) -> Void)?
+
     @State private var isHovered: Bool = false
+    @State private var isEditing: Bool = false
+    @State private var editName: String = ""
+    @State private var editHours: Int = 0
+    @State private var editMinutes: Int = 0
 
     var body: some View {
-        HStack(spacing: 10) {
-            Button {
-                if task.isCompleted {
-                    onUncomplete(task)
-                } else {
-                    onComplete(task)
-                }
-            } label: {
-                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(task.isCompleted ? .green : .secondary)
-            }
-            .buttonStyle(.plain)
-            .help(task.isCompleted ? "Mark as incomplete" : "Mark as completed")
-
-            stateIndicator
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(task.name)
-                    .font(.body)
-                    .foregroundStyle(task.isCompleted ? .secondary : .primary)
-                    .strikethrough(task.isCompleted)
-
-                HStack(spacing: 4) {
-                    Text(TimeFormatter.format(task.currentElapsed()))
-                    if let target = task.targetTime, target > 0 {
-                        Text("/")
-                        Text(TimeFormatter.format(target))
+        HStack(spacing: isEditing ? 0 : 8) {
+            if isEditing {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 4) {
+                        TextField("Task name", text: $editName)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.body)
+                            .onSubmit { saveEdit() }
+                        Button { saveEdit() } label: {
+                            Image(systemName: "checkmark.square")
+                                .font(.system(size: 14))
+                        }
+                        .buttonStyle(.plain)
+                        .help("Save changes")
+                        Button { cancelEdit() } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 11))
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                        .help("Cancel")
+                    }
+                    HStack(spacing: 4) {
+                        TextField("0", value: $editHours, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.caption)
+                            .frame(width: 50)
+                        Text("h")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        TextField("0", value: $editMinutes, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.caption)
+                            .frame(width: 50)
+                        Text("m")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            if isHovered, !task.isCompleted {
-                if let onMoveUp {
-                    Button {
-                        onMoveUp(task)
-                    } label: {
-                        Image(systemName: "chevron.up")
-                            .font(.system(size: 10, weight: .bold))
+            } else {
+                Button {
+                    if task.isCompleted {
+                        onUncomplete(task)
+                    } else {
+                        onComplete(task)
                     }
-                    .buttonStyle(.plain)
-                    .help("Move up")
+                } label: {
+                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(task.isCompleted ? .green : .secondary)
                 }
-                if let onMoveDown {
-                    Button {
-                        onMoveDown(task)
-                    } label: {
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .bold))
+                .buttonStyle(.plain)
+                .help(task.isCompleted ? "Mark as incomplete" : "Mark as completed")
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(task.name)
+                        .font(.body)
+                        .foregroundStyle(task.isCompleted ? .secondary : .primary)
+                        .strikethrough(task.isCompleted)
+
+                    HStack(spacing: 4) {
+                        Text(TimeFormatter.format(task.currentElapsed()))
+                        if let target = task.targetTime, target > 0 {
+                            Text("/")
+                            Text(TimeFormatter.format(target))
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .help("Move down")
-                }
-            }
-
-            actionButton
-
-            Button {
-                onDelete?(task)
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.caption)
                     .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 4)
+
+                actionButton
+
+                if isHovered {
+                    Button { enterEditMode() } label: {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 11))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.secondary)
+                    .help("Edit \"\(task.name)\"")
+                }
+
+                Button {
+                    onDelete?(task)
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help("Delete \"\(task.name)\"")
             }
-            .buttonStyle(.plain)
-            .help("Delete \"\(task.name)\"")
         }
         .padding(.vertical, 6)
-        .padding(.horizontal, 12)
-        .background(
-            isHovered ? Color.primary.opacity(0.05) : Color.clear
-        )
-        .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.15)) {
-                isHovered = hovering
-            }
-        }
-        .overlay(alignment: .bottom) {
-            Divider()
-                .padding(.leading, 36)
-        }
+        .padding(.horizontal, 8)
+        .onHover { if !isEditing { isHovered = $0 } }
         .contextMenu {
-            if task.isCompleted {
-                Button("Uncomplete") { onUncomplete(task) }
-            } else {
-                if task.isRunning {
-                    Button("Pause") { onPause(task) }
+            if !isEditing {
+                if task.isCompleted {
+                    Button("Uncomplete") { onUncomplete(task) }
                 } else {
-                    Button("Start") { onStart(task) }
+                    if task.isRunning {
+                        Button("Pause") { onPause(task) }
+                    } else {
+                        Button("Start") { onStart(task) }
+                    }
+                    Divider()
+                    Button("Rename") { enterEditMode() }
                 }
                 Divider()
-                Button("Rename") { onEdit?(task) }
-            }
-            Divider()
-            Button("Delete", role: .destructive) { onDelete?(task) }
-        }
-    }
-
-    // MARK: State Indicator
-
-    @ViewBuilder
-    private var stateIndicator: some View {
-        Group {
-            switch task.displayState {
-            case .completed:
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.secondary)
-            case .running:
-                Image(systemName: "circle.fill")
-                    .font(.system(size: 8))
-                    .foregroundStyle(.green)
-            case .paused:
-                Image(systemName: "circle.fill")
-                    .font(.system(size: 8))
-                    .foregroundStyle(.orange)
-            case .idle:
-                Image(systemName: "circle")
-                    .font(.system(size: 8))
-                    .foregroundStyle(.secondary)
+                Button("Delete", role: .destructive) { onDelete?(task) }
             }
         }
-        .frame(width: 24)
     }
 
     // MARK: Action Button
@@ -148,24 +141,68 @@ struct TaskRowView: View {
     private var actionButton: some View {
         switch task.displayState {
         case .completed:
-            Text("Completed")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Button { onUncomplete(task) } label: {
+                Image(systemName: "checkmark.circle")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+            .help("Mark as incomplete")
         case .running:
-            Button("Pause") { onPause(task) }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .help("Pause timer")
+            Button { onPause(task) } label: {
+                Image(systemName: "pause.circle")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.orange)
+            }
+            .buttonStyle(.plain)
+            .help("Pause timer")
         case .paused:
-            Button("Resume") { onResume(task) }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .help("Resume timer")
+            Button { onResume(task) } label: {
+                Image(systemName: "play.circle")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+            .help("Resume timer")
         case .idle:
-            Button("Start") { onStart(task) }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .help("Start tracking")
+            Button { onStart(task) } label: {
+                Image(systemName: "play.circle")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Start tracking")
         }
+    }
+
+    // MARK: Edit Helpers
+
+    private func enterEditMode() {
+        editName = task.name
+        if let target = task.targetTime, target > 0 {
+            editHours = Int(target) / 3600
+            editMinutes = (Int(target) % 3600) / 60
+        } else {
+            editHours = 0
+            editMinutes = 0
+        }
+        isEditing = true
+    }
+
+    private func saveEdit() {
+        let trimmed = editName.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        if trimmed != task.name {
+            onRename?(task, trimmed)
+        }
+        let newTarget: TimeInterval? = (editHours > 0 || editMinutes > 0)
+            ? TimeInterval(editHours * 3600 + editMinutes * 60)
+            : nil
+        onUpdateTarget?(task, newTarget)
+        isEditing = false
+    }
+
+    private func cancelEdit() {
+        isEditing = false
     }
 }

@@ -15,7 +15,8 @@ struct StatusBarLabelView: View {
             pausedRow(for: task)
         } else {
             Image(systemName: "brain.head.profile")
-                .font(.system(size: 12))
+                .font(.system(size: 14))
+                .foregroundStyle(.primary)
         }
     }
 
@@ -28,6 +29,7 @@ struct StatusBarLabelView: View {
             taskIcon(task)
             Text(task.name)
                 .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.primary)
                 .lineLimit(1)
             if elapsed > 0 {
                 Text(TimeFormatter.format(elapsed))
@@ -43,6 +45,7 @@ struct StatusBarLabelView: View {
                 }
             }
         }
+        .frame(minWidth: 140)
     }
 
     @ViewBuilder
@@ -51,6 +54,7 @@ struct StatusBarLabelView: View {
             taskIcon(task)
             Text(task.name)
                 .font(.system(size: 11))
+                .foregroundStyle(.primary)
                 .lineLimit(1)
             if task.accumulatedElapsed > 0 {
                 Text(TimeFormatter.format(task.accumulatedElapsed))
@@ -58,10 +62,12 @@ struct StatusBarLabelView: View {
                     .foregroundStyle(.orange)
             }
         }
+        .frame(minWidth: 140)
     }
 
     private func taskIcon(_ task: Task) -> some View {
         Image(systemName: task.iconName)
-            .font(.system(size: 11, weight: .semibold))
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(.primary)
     }
 }

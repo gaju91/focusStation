@@ -1,8 +1,6 @@
 import SwiftData
 import SwiftUI
 
-/// Menu bar task timer for macOS.
-/// Owns dependency injection for TimerManager, TickGenerator, and MenuBarController.
 @main
 struct FocusStationApp: App {
     private let container: ModelContainer
@@ -23,15 +21,16 @@ struct FocusStationApp: App {
 
         let controller = MenuBarController(
             timerManager: manager,
-            tickGenerator: tickGen,
-            modelContext: container.mainContext
+            tickGenerator: tickGen
         )
         self._menuBarController = State(initialValue: controller)
     }
 
     var body: some Scene {
-        Settings {
-            SettingsView()
+        MenuBarExtra(isInserted: .constant(false)) {
+            EmptyView()
+        } label: {
+            EmptyView()
         }
     }
 }

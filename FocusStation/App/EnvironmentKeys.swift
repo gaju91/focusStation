@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 
 extension EnvironmentValues {
     @Entry var timerManager: any TimerManagerProtocol = NoOpTimerManager()
@@ -20,6 +19,6 @@ private final class NoOpTimerManager: TimerManagerProtocol {
     func updateIcon(of task: Task, to iconName: String) {}
     func updateTargetTime(of task: Task, to targetTime: TimeInterval?) {}
     func move(task: Task, to index: Int) {}
-    func swapTasks(_ a: Task, with b: Task) {}
+    func reorderTasks(_ tasks: [Task]) {}
     func clearAllData() {}
 }

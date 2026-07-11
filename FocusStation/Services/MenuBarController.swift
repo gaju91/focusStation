@@ -1,11 +1,10 @@
 import AppKit
 import Observation
-import SwiftData
 import SwiftUI
 
 private enum Layout {
-    static let statusItemWidth: CGFloat = 180
-    static let popoverWidth: CGFloat = 280
+    static let popoverMinWidth: CGFloat = 230
+    static let popoverMaxWidth: CGFloat = 400
     static let popoverHeight: CGFloat = 400
 }
 
@@ -15,25 +14,22 @@ private enum Layout {
 final class MenuBarController {
     private let timerManager: any TimerManagerProtocol
     private let tickGenerator: TickGenerator
-    private let modelContext: ModelContext
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private weak var hostingView: NSHostingView<MenuBarContainerView>?
 
     init(
         timerManager: any TimerManagerProtocol,
-        tickGenerator: TickGenerator,
-        modelContext: ModelContext
+        tickGenerator: TickGenerator
     ) {
         self.timerManager = timerManager
         self.tickGenerator = tickGenerator
-        self.modelContext = modelContext
         setupStatusBar()
         observeTick()
     }
 
     private func setupStatusBar() {
-        let item = NSStatusBar.system.statusItem(withLength: Layout.statusItemWidth)
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem = item
 
         guard let button = item.button else { return }
@@ -49,8 +45,6 @@ final class MenuBarController {
             tick: tickGenerator.value
         )
         let hosting = NSHostingView(rootView: rootView)
-        hosting.frame.size = NSSize(width: Layout.statusItemWidth, height: NSStatusBar.system.thickness)
-        hosting.appearance = NSApp.effectiveAppearance
         hosting.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(hosting)
         self.hostingView = hosting
@@ -63,12 +57,10 @@ final class MenuBarController {
         ])
 
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: Layout.popoverWidth, height: Layout.popoverHeight)
         popover.behavior = .transient
         popover.animates = false
         popover.contentViewController = NSHostingController(
             rootView: DropdownView()
-                .environment(\.modelContext, modelContext)
                 .environment(\.timerManager, timerManager)
         )
         self.popover = popover
@@ -79,10 +71,10 @@ final class MenuBarController {
         if popover.isShown {
             popover.performClose(nil)
         } else {
-            popover.contentSize = NSSize(width: Layout.popoverWidth, height: Layout.popoverHeight)
+            let fittingWidth = popover.contentViewController?.view.fittingSize.width ?? Layout.popoverMinWidth
+            let width = min(max(fittingWidth, Layout.popoverMinWidth), Layout.popoverMaxWidth)
+            popover.contentSize = NSSize(width: width, height: Layout.popoverHeight)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            // Re-assert after show(); NSHostingController may override contentSize.
-            popover.contentSize = NSSize(width: Layout.popoverWidth, height: Layout.popoverHeight)
             NSApp.activate(ignoringOtherApps: true)
         }
     }
@@ -99,7 +91,6 @@ final class MenuBarController {
     }
 
     private func updateLabel() {
-        hostingView?.appearance = NSApp.effectiveAppearance
         hostingView?.rootView = MenuBarContainerView(
             timerManager: timerManager,
             tick: tickGenerator.value

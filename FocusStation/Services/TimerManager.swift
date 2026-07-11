@@ -155,6 +155,14 @@ final class TimerManager: TimerManagerProtocol {
         refreshTasks()
     }
 
+    func reorderTasks(_ orderedTasks: [Task]) {
+        for (index, task) in orderedTasks.enumerated() where !task.isCompleted {
+            task.displayOrder = index
+        }
+        try? modelContext.save()
+        refreshTasks()
+    }
+
     func clearAllData() {
         let taskDescriptor = FetchDescriptor<Task>()
         if let allTasks = try? modelContext.fetch(taskDescriptor) {

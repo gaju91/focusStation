@@ -9,6 +9,5 @@ struct MenuBarContainerView: View {
     var body: some View {
         StatusBarLabelView(timerManager: timerManager)
             .id(tick)
-            .frame(minWidth: 160, idealHeight: NSStatusBar.system.thickness)
     }
 }
