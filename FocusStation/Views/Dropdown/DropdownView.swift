@@ -1,12 +1,55 @@
 import AppKit
 import SwiftUI
 
-/// Pending task before creation — holds inline input state.
-struct PendingTask: Identifiable {
-    let id = UUID()
-    var name = ""
-    var hours = 0
-    var minutes = 0
+/// Shared inline task form — used by both pending creation and edit mode.
+struct TaskFormView: View {
+    @Binding var name: String
+    @Binding var hours: Int
+    @Binding var minutes: Int
+    let onSave: () -> Void
+    let onCancel: () -> Void
+    let saveHelp: String
+    let cancelHelp: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                TextField("Task name", text: $name)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.body)
+                    .onSubmit { onSave() }
+                Button { onSave() } label: {
+                    Image(systemName: "checkmark.square")
+                        .font(.system(size: 14))
+                }
+                .buttonStyle(.plain)
+                .help(saveHelp)
+                Button { onCancel() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 11))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .help(cancelHelp)
+            }
+            HStack(spacing: 4) {
+                TextField("0", value: $hours, format: .number)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.caption)
+                    .frame(width: 50)
+                Text("h")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField("0", value: $minutes, format: .number)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.caption)
+                    .frame(width: 50)
+                Text("m")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
 }
 
 /// Pending task row shown inline in the task list before creation.
@@ -17,47 +60,55 @@ struct PendingTaskRowView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                TextField("Task name", text: $row.name)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.body)
-                    .onSubmit { onSave() }
-                Button { onSave() } label: {
-                    Image(systemName: "checkmark.square")
-                        .font(.system(size: 14))
-                }
-                .buttonStyle(.plain)
-                .help("Save task")
-                Button { onDiscard() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 11))
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .help("Discard")
-            }
-            HStack(spacing: 4) {
-                TextField("0", value: $row.hours, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.caption)
-                    .frame(width: 50)
-                Text("h")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("0", value: $row.minutes, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.caption)
-                    .frame(width: 50)
-                Text("m")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            }
+            TaskFormView(
+                name: $row.name,
+                hours: $row.hours,
+                minutes: $row.minutes,
+                onSave: onSave,
+                onCancel: onDiscard,
+                saveHelp: "Save task",
+                cancelHelp: "Discard"
+            )
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 8)
     }
+}
+
+@MainActor
+private final class TickDriver: NSObject {
+    var onFire: (() -> Void)?
+    private var timer: Timer?
+
+    func start() {
+        stop()
+        let timer = Timer(
+            timeInterval: 1.0,
+            target: self,
+            selector: #selector(fire),
+            userInfo: nil,
+            repeats: true
+        )
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
+    }
+
+    func stop() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    @objc private func fire() {
+        onFire?()
+    }
+}
+
+/// Pending task before creation — holds inline input state.
+struct PendingTask: Identifiable {
+    let id = UUID()
+    var name = ""
+    var hours = 0
+    var minutes = 0
 }
 
 struct DropdownView: View {
@@ -65,6 +116,8 @@ struct DropdownView: View {
 
     @State private var viewModel: DropdownViewModel?
     @State private var pendingRows: [PendingTask] = []
+    @State private var displayTick = 0
+    @State private var tickDriver = TickDriver()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -80,11 +133,15 @@ struct DropdownView: View {
             footerView
         }
         .frame(minWidth: 230, maxWidth: 400)
-        .frame(minHeight: 340)
         .onAppear {
             if viewModel == nil {
                 viewModel = DropdownViewModel(timerManager: timerManager)
             }
+            tickDriver.onFire = { displayTick &+= 1 }
+            tickDriver.start()
+        }
+        .onDisappear {
+            tickDriver.stop()
         }
     }
 
@@ -112,9 +169,10 @@ struct DropdownView: View {
     private var taskListView: some View {
         List {
             if let tasks = viewModel?.sortedTasks {
-                ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
+                ForEach(tasks) { task in
                     TaskRowView(
                         task: task,
+                        tick: displayTick,
                         onStart: { viewModel?.startTask($0) },
                         onPause: { viewModel?.pauseTask($0) },
                         onResume: { viewModel?.resumeTask($0) },
@@ -126,12 +184,11 @@ struct DropdownView: View {
                         onUpdateTarget: { task, target in
                             viewModel?.updateTaskTarget(task, to: target)
                         },
+                        onEditBegin: { viewModel?.suspendSync() },
+                        onEditEnd: { viewModel?.resumeSync() },
                         onDelete: { viewModel?.deleteTask($0) }
                     )
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowSeparator(
-                        index == tasks.count - 1 && !pendingRows.isEmpty ? .hidden : .visible
-                    )
                 }
                 .onMove { indices, destination in
                     viewModel?.reorderTasks(from: indices, to: destination)
@@ -139,10 +196,8 @@ struct DropdownView: View {
             }
 
             if !pendingRows.isEmpty, viewModel?.isEmpty == false {
-                Color.accentColor.opacity(0.5)
-                    .frame(height: 2)
+                Divider()
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowSeparator(.hidden)
             }
 
             ForEach($pendingRows) { $row in

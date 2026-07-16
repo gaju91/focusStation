@@ -8,7 +8,7 @@ struct MenuBarLabelView: View {
     let timerManager: any TimerManagerProtocol
 
     var body: some View {
-        StatusBarLabelView(timerManager: timerManager)
+        StatusBarLabelView(timerManager: timerManager, tick: tickGenerator.value)
             .id(tickGenerator.value)
     }
 }

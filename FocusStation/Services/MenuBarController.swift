@@ -6,6 +6,9 @@ private enum Layout {
     static let popoverMinWidth: CGFloat = 230
     static let popoverMaxWidth: CGFloat = 400
     static let popoverHeight: CGFloat = 400
+    static let statusItemHorizontalPadding: CGFloat = 8
+    static let statusItemMinWidth: CGFloat = 24
+    static let statusItemMaxWidth: CGFloat = 260
 }
 
 /// Owns the NSStatusBar item, NSPopover, tick observation, and
@@ -26,10 +29,11 @@ final class MenuBarController {
         self.tickGenerator = tickGenerator
         setupStatusBar()
         observeTick()
+        observeTasks()
     }
 
     private func setupStatusBar() {
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        let item = NSStatusBar.system.statusItem(withLength: Layout.statusItemMinWidth)
         self.statusItem = item
 
         guard let button = item.button else { return }
@@ -45,16 +49,9 @@ final class MenuBarController {
             tick: tickGenerator.value
         )
         let hosting = NSHostingView(rootView: rootView)
-        hosting.translatesAutoresizingMaskIntoConstraints = false
+        hosting.translatesAutoresizingMaskIntoConstraints = true
         button.addSubview(hosting)
         self.hostingView = hosting
-
-        NSLayoutConstraint.activate([
-            hosting.leadingAnchor.constraint(equalTo: button.leadingAnchor),
-            hosting.trailingAnchor.constraint(equalTo: button.trailingAnchor),
-            hosting.topAnchor.constraint(equalTo: button.topAnchor),
-            hosting.bottomAnchor.constraint(equalTo: button.bottomAnchor),
-        ])
 
         let popover = NSPopover()
         popover.behavior = .transient
@@ -64,6 +61,7 @@ final class MenuBarController {
                 .environment(\.timerManager, timerManager)
         )
         self.popover = popover
+        resizeStatusItem()
     }
 
     @objc private func togglePopover() {
@@ -76,6 +74,18 @@ final class MenuBarController {
             popover.contentSize = NSSize(width: width, height: Layout.popoverHeight)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
+    private func observeTasks() {
+        withObservationTracking {
+            _ = timerManager.tasks.count
+        } onChange: { [weak self] in
+            Swift.Task { @MainActor [weak self] in
+                self?.updateLabel()
+                self?.repositionPopover()
+                self?.observeTasks()
+            }
         }
     }
 
@@ -95,5 +105,24 @@ final class MenuBarController {
             timerManager: timerManager,
             tick: tickGenerator.value
         )
+        resizeStatusItem()
+    }
+
+    private func resizeStatusItem() {
+        guard let hosting = hostingView, let item = statusItem, let button = item.button else { return }
+        hosting.layoutSubtreeIfNeeded()
+        let fittingWidth = hosting.fittingSize.width
+        let width = min(
+            max(fittingWidth + Layout.statusItemHorizontalPadding, Layout.statusItemMinWidth),
+            Layout.statusItemMaxWidth
+        )
+        item.length = width
+        hosting.frame = NSRect(x: 0, y: 0, width: width, height: button.bounds.height)
+    }
+
+    private func repositionPopover() {
+        guard let popover, popover.isShown, let button = statusItem?.button else { return }
+        hostingView?.layoutSubtreeIfNeeded()
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
     }
 }

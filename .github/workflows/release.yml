@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Build Release
+        run: |
+          xcodebuild -project FocusStation.xcodeproj \
+            -scheme FocusStation \
+            -configuration Release \
+            CONFIGURATION_BUILD_DIR=build/Release \
+            build
+
+      - name: Package ZIP
+        run: |
+          ditto -c -k --keepParent \
+            build/Release/FocusStation.app \
+            build/Release/FocusStation-v${{ env.VERSION }}.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: FocusStation v${{ env.VERSION }}
+          files: build/Release/FocusStation-v${{ env.VERSION }}.zip

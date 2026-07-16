@@ -7,7 +7,6 @@ struct MenuBarContainerView: View {
     let tick: Int
 
     var body: some View {
-        StatusBarLabelView(timerManager: timerManager)
-            .id(tick)
+        StatusBarLabelView(timerManager: timerManager, tick: tick)
     }
 }

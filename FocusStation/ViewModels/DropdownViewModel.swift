@@ -8,12 +8,7 @@ final class DropdownViewModel {
     var isEmpty: Bool { tasks.isEmpty }
 
     var sortedTasks: [Task] {
-        tasks.sorted { lhs, rhs in
-            if lhs.displayState != rhs.displayState {
-                return displayStateOrder(lhs.displayState) < displayStateOrder(rhs.displayState)
-            }
-            return lhs.displayOrder < rhs.displayOrder
-        }
+        tasks.sorted { $0.displayOrder < $1.displayOrder }
     }
 
     private let timerManager: any TimerManagerProtocol
@@ -71,7 +66,7 @@ final class DropdownViewModel {
     // MARK: CRUD
 
     func createTask(name: String, iconName: String, targetTime: TimeInterval?) {
-        let order = -(Int(Date.now.timeIntervalSince1970))
+        let order = Int(Date.now.timeIntervalSince1970)
         _ = timerManager.createTask(name: name, iconName: iconName, targetTime: targetTime, displayOrder: order)
         refreshTasks()
     }
@@ -123,12 +118,13 @@ final class DropdownViewModel {
 
     // MARK: Private
 
-    private func displayStateOrder(_ state: Task.DisplayState) -> Int {
-        switch state {
-        case .running:   return 0
-        case .paused:    return 1
-        case .idle:      return 2
-        case .completed: return 3
-        }
+    func suspendSync() {
+        syncTimer?.invalidate()
+        syncTimer = nil
+    }
+
+    func resumeSync() {
+        guard syncTimer == nil else { return }
+        startSyncTimer()
     }
 }

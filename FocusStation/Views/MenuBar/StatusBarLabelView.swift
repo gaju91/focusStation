@@ -6,8 +6,10 @@ import SwiftUI
 /// Idle:    `🧠`
 struct StatusBarLabelView: View {
     let timerManager: any TimerManagerProtocol
+    let tick: Int
 
     var body: some View {
+        let _ = tick
         let tasks = timerManager.tasks
         if let task = tasks.first(where: { $0.displayState == .running }) {
             runningRow(for: task)
@@ -17,6 +19,7 @@ struct StatusBarLabelView: View {
             Image(systemName: "brain.head.profile")
                 .font(.system(size: 14))
                 .foregroundStyle(.primary)
+                .padding(.horizontal, 6)
         }
     }
 
@@ -24,6 +27,7 @@ struct StatusBarLabelView: View {
     private func runningRow(for task: Task) -> some View {
         let elapsed = task.currentElapsed()
         let hasTarget = (task.targetTime ?? 0) > 0
+        let isOvertime = hasTarget && elapsed > (task.targetTime ?? 0)
 
         HStack(spacing: 4) {
             taskIcon(task)
@@ -34,7 +38,7 @@ struct StatusBarLabelView: View {
             if elapsed > 0 {
                 Text(TimeFormatter.format(elapsed))
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(isOvertime ? .red : .green)
                 if hasTarget {
                     Text("/")
                         .font(.system(size: 11, weight: .medium))
@@ -45,11 +49,13 @@ struct StatusBarLabelView: View {
                 }
             }
         }
-        .frame(minWidth: 140)
+        .padding(.horizontal, 6)
     }
 
     @ViewBuilder
     private func pausedRow(for task: Task) -> some View {
+        let isOvertime = (task.targetTime ?? 0) > 0 && task.accumulatedElapsed > (task.targetTime ?? 0)
+
         HStack(spacing: 4) {
             taskIcon(task)
             Text(task.name)
@@ -59,10 +65,10 @@ struct StatusBarLabelView: View {
             if task.accumulatedElapsed > 0 {
                 Text(TimeFormatter.format(task.accumulatedElapsed))
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(isOvertime ? .red : .orange)
             }
         }
-        .frame(minWidth: 140)
+        .padding(.horizontal, 6)
     }
 
     private func taskIcon(_ task: Task) -> some View {
