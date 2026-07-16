@@ -18,7 +18,7 @@ FocusStation lives in your Mac's menu bar. Add tasks, start a timer, and your pr
 
 ## Install
 
-1. Download `FocusStation-v0.1.0.zip` from [Releases](https://github.com/gaju91/focusStation/releases)
+1. Download the latest `FocusStation-v*.zip` from [Releases](https://github.com/gaju91/focusStation/releases/latest)
 2. Unzip and drag `FocusStation.app` to `/Applications`
 3. **First launch:** right-click → **Open** (ad-hoc signed — Gatekeeper requires this once)
 
@@ -87,28 +87,28 @@ The compiled `.app` bundle lands at `build/Release/FocusStation.app`.
 This creates a single compressed file you can share. `ditto` preserves macOS metadata (permissions, code signature) which plain `zip` would strip.
 
 ```bash
-ditto -c -k --keepParent build/Release/FocusStation.app build/Release/FocusStation-v0.1.0.zip
+ditto -c -k --keepParent build/Release/FocusStation.app build/Release/FocusStation-vX.Y.Z.zip
 ```
 
-Replace `v0.1.0` with the current version number.
+Replace `X.Y.Z` with the current version number.
 
 **4. Tag the release**
 
 This marks a point in Git history. Use [semantic versioning](https://semver.org): `MAJOR.MINOR.PATCH`. For example, `v0.1.0` for the first release, `v0.1.1` for a bug fix, `v0.2.0` for new features.
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
 
 **5. Upload to GitHub**
 
 Go to [GitHub Releases](https://github.com/gaju91/focusStation/releases) → "Draft a new release":
 
-- **Tag:** select the tag you just pushed (e.g., `v0.1.0`)
-- **Title:** `FocusStation v0.1.0`
+- **Tag:** select the tag you just pushed
+- **Title:** `FocusStation vX.Y.Z`
 - **Description:** a brief list of changes since the last release
-- **Attach:** drag `build/Release/FocusStation-v0.1.0.zip` (from step 3) into the binaries box
+- **Attach:** drag `build/Release/FocusStation-vX.Y.Z.zip` (from step 3) into the binaries box
 - Click **Publish release**
 
 The ZIP is now publicly downloadable from the Releases page — anyone can install from `## Install` above.
