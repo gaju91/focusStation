@@ -1,0 +1,124 @@
+---
+title: "FocusStation v0.1.1 — The 'It Actually Works Now' Release"
+date: "2026-07-16"
+readTime: "6 min read"
+status: "shipped"
+repo: "https://github.com/gaju91/focusStation"
+release: "https://github.com/gaju91/focusStation/releases/tag/v0.1.1"
+---
+
+## Shipping reveals everything you missed
+
+v0.1.0 shipped on July 11. I was proud of it. A menu bar timer, 19 Swift files, zero dependencies, built over a few weekends by someone who'd never written Swift before.
+
+Then I actually used it.
+
+The timer stopped counting when I closed my laptop. The popover froze — elapsed time only updated when I moved the mouse. The menu bar showed just a brain icon after I'd started a task. Editing a running task was impossible — clicking the text field did nothing. The task list kept reordering itself whenever I started something.
+
+Every single one of those bugs was something I didn't catch because I was testing in isolation — start a timer, verify it runs, move on. I wasn't living with the app. Real usage exposes everything.
+
+v0.1.1 is five days of fixing what v0.1.0 got wrong.
+
+---
+
+## What was broken and why
+
+### The sleep timer bug
+
+**Symptom:** Close the laptop lid, reopen it — timer hasn't advanced. The 2-hour meeting you started before lunch still shows 2 hours. You lost 3 hours of elapsed time.
+
+**Root cause:** `TimerManager+SleepWake.swift` was calling `pauseAllRunningTasks()` on sleep. It captured `accumulatedElapsed` at the sleep moment and nulled `startedAt`. When the Mac woke up, the task was paused and the accumulated time didn't include the sleep duration.
+
+**The fix:** Don't pause on sleep. The timer engine was already timestamp-based (`accumulatedElapsed + Date().timeIntervalSince(startedAt)`). The math was correct — I was just breaking it by pausing. Now `handleSleep()` only stops the display timer. On wake, it restarts. Running tasks keep their `startedAt` intact. `Date()` naturally advances through sleep, so `currentElapsed()` includes the full duration.
+
+Deleted the `pauseAllRunningTasks()` helper. 13 lines removed, 0 added. Simplest fix in the release.
+
+### The frozen popover
+
+**Symptom:** Elapsed time in the dropdown only updated when you hovered a row or clicked something. Not every second.
+
+**Root cause:** Two things. First, `MenuBarController.updateLabel()` was calling `popover.performClose(nil)` then `popover.show(...)` every single second — destroying and recreating the entire popover content. Second, `DropdownView` used `.id(displayTick)` on the task list, which forced a full view tree recreation every second. All `@State` — including inline editing, hover state, edit form bindings — was nuked on every tick.
+
+**The fix:** The popover is never closed. `updateLabel()` only updates the menu bar label's `rootView`. Popover repositioning happens only when tasks actually change (started, paused, deleted) via `observeTasks()`.
+
+For the popover content, `.id(displayTick)` was removed. Instead, `displayTick` is passed as a plain `let tick: Int` parameter to each `TaskRowView`. The body re-evaluates when `tick` changes (recomputing `currentElapsed()`), but the view identity is stable — `@State` survives. Inline editing, hover state, text field focus — all preserved across timer ticks.
+
+A new `PopoverTickDriver` class drives the 1-second tick. Selector-based `Timer` on `RunLoop.main.common` — same pattern as `TickGenerator`, no `@Sendable` closure warnings.
+
+### The menu bar that showed nothing
+
+**Symptom:** You'd start a task. The popover showed it running. The menu bar showed just a brain icon. Task name? Elapsed time? Gone.
+
+**Root cause:** `variableLength` status item + `NSHostingView` wasn't reporting `intrinsicContentSize` correctly. Even with `invalidateIntrinsicContentSize()`, the status item didn't resize.
+
+**The fix:** Explicit manual sizing. `resizeStatusItem()` measures `hostingView.fittingSize.width`, adds 8pt padding, clamps between 24–260px, and sets `statusItem.length` directly. The hosting view frame is set manually — no Auto Layout constraints, no `translatesAutoresizingMaskIntoConstraints = false`. Called on init, every tick, and every task state change.
+
+### Editing a running task was impossible
+
+**Symptom:** Click the pencil icon on a running task. The edit form appeared — name field, target h/m fields, save/cancel buttons. Click the text field. Nothing. No cursor. No focus.
+
+**Root cause:** Combination of the frozen popover (every-second rebuilds destroying `@State`) and the 1-second sync timer in `DropdownViewModel` that kept overwriting `tasks` while the edit form was open. The text field bindings (`$editName`, `$editHours`, `$editMinutes`) were getting invalidated on every rebuild.
+
+**The fix:** The popover rebuild was already fixed (above). For the sync timer: `DropdownViewModel` now exposes `suspendSync()` and `resumeSync()`. `TaskRowView` calls `suspendSync()` when entering edit mode and `resumeSync()` on save or cancel. The sync timer is paused during editing — no more background rebuilds destroying the edit state.
+
+Also extracted the inline form into a shared `TaskFormView` used by both `PendingTaskRowView` (new task creation) and `TaskRowView` (edit mode). Byte-for-byte identical. No layout differences between the two.
+
+### Tasks kept moving when I started them
+
+**Symptom:** Create tasks: Task A, Task B, Task C. Start Task C. Task C jumps to the top of the list.
+
+**Root cause:** `sortedTasks` sorted by `displayState` first (running → paused → idle → completed), then `displayOrder`. Starting a task moved it to position 0 because its state changed to `.running`.
+
+**The fix:** Sort by `displayOrder` only. `displayStateOrder` helper deleted. New tasks use a positive timestamp (`Int(Date.now.timeIntervalSince1970)`) for append-to-bottom behavior. Only drag-and-drop changes order now.
+
+### No visual signal when you go over target
+
+**Symptom:** You set 30 minutes for a task. It hits 30 minutes, 45 minutes, 2 hours — the timer color stays the same.
+
+**The fix:** `currentElapsed() > targetTime` → the elapsed text turns `.red` instead of `.green` (running) or `.orange` (paused). Works in both the popover row and the menu bar label.
+
+---
+
+## What's in v0.1.1
+
+Same feature set as v0.1.0, but everything actually works:
+
+-   Timer survives sleep and lid close — elapsed time includes the full duration
+-   Popover live-updates every second without destroying state
+-   Menu bar correctly shows task name + elapsed time
+-   Inline editing works on running, paused, and idle tasks
+-   Tasks stay in insertion order — only drag-and-drop reorders
+-   Elapsed time turns red when past the target
+-   Status item width is content-driven (24–260px) with 6pt padding
+-   Hover icons (pencil + trash) appear left of play/pause — action button never shifts position
+-   Zero context menus — all actions are icons in the row
+
+---
+
+## What I learned from v0.1.0
+
+**"It works on my machine" is a lie you tell yourself.** Every bug in v0.1.1 was something I missed because I tested in short bursts — start a timer, verify it ticks, stop. I wasn't sleeping my Mac mid-timer. I wasn't editing tasks while one was running. Real usage breaks things immediately.
+
+**State management in SwiftUI is fragile.** The difference between `@State` surviving a rebuild and being nuked is one wrong `.id()` modifier. The difference between a working text field and a dead one is the parent ForEach recreating the view every second. I learned to trace `@State` lifetimes through the view tree before adding any new feature.
+
+**Timestamp-based anything is the right answer.** The sleep timer fix was 13 lines deleted, zero added. The timestamp math was correct from day one — I was just actively breaking it. Every time you think you need a counter, you don't.
+
+**The AI can build it, but you have to test it.** v0.1.0 was vibe-coded. v0.1.1 was debugged by a human using the actual app, filing concrete bugs, and verifying fixes. The AI wrote the fixes, but I had to find the problems first. That's the contract.
+
+---
+
+## What's next
+
+The core loop is solid now — add tasks, start timers, see elapsed time at a glance. Next:
+
+-   **Today's total** — total focus time for the day in the menu bar or popover
+-   **Notifications** — optional ping when you cross your target time
+-   **Keyboard shortcuts** — global hotkeys for start/pause/switch
+-   **Statistics** — daily/weekly breakdown of where your time went
+-   **Code signing** — proper Apple Developer cert so there's no Gatekeeper warning on first launch
+
+But none of that matters until the foundation is bulletproof. v0.1.1 is that foundation.
+
+---
+
+*Still 19 Swift files. Still zero dependencies. Still built by someone who had never shipped Swift before July 2026.*
