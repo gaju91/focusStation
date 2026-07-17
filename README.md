@@ -20,7 +20,7 @@ FocusStation lives in your Mac's menu bar. Add tasks, start a timer, and your pr
 
 1. Download the latest `FocusStation-v*.zip` from [Releases](https://github.com/gaju91/focusStation/releases/latest)
 2. Unzip and drag `FocusStation.app` to `/Applications`
-3. **First launch:** right-click → **Open** (ad-hoc signed — Gatekeeper requires this once)
+3. **First launch:** right-click → **Open**. If that doesn't work, run `xattr -cr /Applications/FocusStation.app` in Terminal, then open normally.
 
 ---
 
