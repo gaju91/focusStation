@@ -1,4 +1,8 @@
-# FocusStation
+<p align="center">
+  <img src="FocusStation/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-256.png" alt="FocusStation app icon" width="112" height="112">
+</p>
+
+<h1 align="center">FocusStation</h1>
 
 **A native, day-specific macOS menu bar task timer for planning realistic work and staying focused.**
 
