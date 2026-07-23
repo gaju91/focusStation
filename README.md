@@ -1,11 +1,17 @@
-<p align="center">
-  <img src="docs/focusStation_Desktop_View.png" alt="FocusStation Today view with running, paused, and completed tasks" width="320">
-  <img src="docs/focusStation_Focus_View.png" alt="FocusStation inline task editor with daily capacity controls" width="320">
-</p>
-
 # FocusStation
 
 **A native, day-specific macOS menu bar task timer for planning realistic work and staying focused.**
+
+FocusStation lives entirely in the Mac menu bar. Plan tasks on a calendar day, give them optional time budgets, work on one task at a time, review previous days, deliberately carry unfinished work forward, and export the history as CSV.
+
+No account. No cloud. No analytics. No networking. No third-party dependencies.
+
+<!--
+Upload docs/focusStation_Walkthrough.mp4 through GitHub's Markdown editor,
+then paste the generated playable video attachment directly below this comment.
+-->
+
+_Complete walkthrough: create, edit, time, complete, delete, review, export, carry, plan ahead, and reorder tasks._
 
 [![Project status](https://img.shields.io/badge/status-complete-2ea44f)](#project-status)
 [![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)](https://swift.org)
@@ -14,23 +20,6 @@
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-silver)](https://developer.apple.com/macos/)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-2ea44f)](#test-and-verify)
 [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
-
-FocusStation lives entirely in the Mac menu bar. Plan tasks on a calendar day, give them optional time budgets, work on one task at a time, review previous days, deliberately carry unfinished work forward, and export the history as CSV.
-
-No account. No cloud. No analytics. No networking. No third-party dependencies.
-
-## See it in action
-
-<p align="center">
-  <a href="docs/focusStation_Walkthrough.mp4">
-    <img src="docs/focusStation_History_View.png" alt="FocusStation history view — click to watch the complete walkthrough" width="420">
-  </a>
-</p>
-
-<p align="center">
-  <a href="docs/focusStation_Walkthrough.mp4"><strong>Watch the complete walkthrough</strong></a>
-  — create, edit, time, complete, delete, review, export, carry, plan ahead, and reorder tasks.
-</p>
 
 ## Project status
 
