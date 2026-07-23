@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="docs/focusStation_Desktop_View.png" alt="FocusStation running from the macOS menu bar" width="800">
+  <img src="docs/focusStation_Desktop_View.png" alt="FocusStation Today view with running, paused, and completed tasks" width="320">
+  <img src="docs/focusStation_Focus_View.png" alt="FocusStation inline task editor with daily capacity controls" width="320">
 </p>
 
 # FocusStation
@@ -18,6 +19,19 @@ FocusStation lives entirely in the Mac menu bar. Plan tasks on a calendar day, g
 
 No account. No cloud. No analytics. No networking. No third-party dependencies.
 
+## See it in action
+
+<p align="center">
+  <a href="docs/focusStation_Walkthrough.mp4">
+    <img src="docs/focusStation_History_View.png" alt="FocusStation history view — click to watch the complete walkthrough" width="420">
+  </a>
+</p>
+
+<p align="center">
+  <a href="docs/focusStation_Walkthrough.mp4"><strong>Watch the complete walkthrough</strong></a>
+  — create, edit, time, complete, delete, review, export, carry, plan ahead, and reorder tasks.
+</p>
+
 ## Project status
 
 **FocusStation is feature-complete for its intended scope.**
@@ -27,6 +41,8 @@ The product is not trying to become a project manager, calendar, team tracker, b
 Maintenance, compatibility fixes, security fixes, and small usability improvements may continue. New feature work should protect the one-second, menu-bar-first workflow.
 
 ## Install
+
+The downloadable v1.0.0 build supports Apple Silicon Macs running macOS 14 Sonoma or later.
 
 1. Download the latest ZIP from [GitHub Releases](https://github.com/gaju91/focusStation/releases/latest).
 2. Unzip it and move `FocusStation.app` to `/Applications`.
@@ -163,13 +179,14 @@ FocusStation/
 │       ├── MenuBarContainerView.swift
 │       └── StatusBarLabelView.swift
 └── Resources/
+    ├── Assets.xcassets/
     └── Info.plist
 
 FocusStationTests/
 └── FocusStationTests.swift
 ```
 
-The production target contains 18 Swift files plus `Info.plist`. The test target contains 65 tests covering the model, timer service, view model, layout calculations, status-bar content, CSV export, day boundaries, and adversarial rendering/state scenarios.
+The production target contains 18 Swift files, `Info.plist`, and the complete macOS app-icon asset catalog. The test target contains 65 tests covering the model, timer service, view model, layout calculations, status-bar content, CSV export, day boundaries, and adversarial rendering/state scenarios.
 
 ## Development
 
@@ -225,7 +242,7 @@ ditto -c -k --keepParent \
   build/Release/FocusStation-vX.Y.Z.zip
 ```
 
-FocusStation is currently distributed unsigned. Preserve the Gatekeeper note in release instructions until signing and notarization are actually configured.
+FocusStation is currently distributed with an ad-hoc signature and is not Apple-notarized. Preserve the Gatekeeper note in release instructions until Developer ID signing and notarization are configured.
 
 ## Product boundaries
 
