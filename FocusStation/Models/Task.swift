@@ -87,10 +87,26 @@ final class Task: Identifiable {
         return .idle
     }
 
+    /// Semantic elapsed-time tone shared by the popover and menu-bar surfaces.
+    /// Overtime takes precedence over paused state.
+    func elapsedTone(at date: Date = .now) -> ElapsedTone {
+        let elapsed = currentElapsed(at: date)
+        if let targetTime, targetTime > 0, elapsed > targetTime {
+            return .overdue
+        }
+        return displayState == .paused ? .paused : .withinLimit
+    }
+
     enum DisplayState {
         case idle
         case running
         case paused
         case completed
+    }
+
+    enum ElapsedTone {
+        case withinLimit
+        case paused
+        case overdue
     }
 }

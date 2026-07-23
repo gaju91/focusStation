@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/b700279c-8f47-4ae6-a9ca-c301f86500f2
 [![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-blue)](https://developer.apple.com/xcode/swiftui/)
 [![SwiftData](https://img.shields.io/badge/Persistence-SwiftData-green)](https://developer.apple.com/xcode/swiftdata/)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-silver)](https://developer.apple.com/macos/)
-[![Tests](https://img.shields.io/badge/tests-65%20passing-2ea44f)](#test-and-verify)
+[![Tests](https://img.shields.io/badge/tests-66%20passing-2ea44f)](#test-and-verify)
 [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ## Project status
@@ -65,14 +65,14 @@ xattr -cr /Applications/FocusStation.app
 - Only one task can run at a time; starting or resuming another task automatically pauses the current one.
 - Elapsed time is derived from timestamps, never from an incrementing counter.
 - A running task is capped at the end of its scheduled local day.
-- FocusStation pauses running work before the Mac sleeps and when the app quits, preventing accidental sleep time from being recorded.
+- Screen and system sleep do not pause running work; elapsed time catches up from the absolute start timestamp after wake. Quitting FocusStation still persists and pauses active work.
 - Completion preserves elapsed time and keeps the task in its current list position with a green check and strikethrough.
 
 ### Menu bar
 
 - Idle state is the brain icon only.
 - Running or paused state shows the task icon, a tail-truncated name, elapsed time, and an optional target.
-- Elapsed time is orange while within the target and red when overdue.
+- Elapsed time is green while within the target, orange when paused, and red when overdue.
 - The full task, state, and time remain available through the native tooltip.
 - The status item is capped at 260 pt and the popover anchor follows the center of its current width.
 
@@ -136,12 +136,12 @@ TickGenerator ──→ MenuBarController ──→ NSStatusItem + NSPopover
 
 - **Views** render state and forward user intent. They do not access SwiftData.
 - **DropdownViewModel** owns the selected day, inline editor state, grouping, capacity validation, carry/repeat orchestration, and export preparation.
-- **TimerManager** is the mutation boundary for timers, CRUD, ordering, sleep handling, legacy migration, and day-boundary reconciliation.
+- **TimerManager** is the mutation boundary for timers, CRUD, ordering, wake handling, legacy migration, and day-boundary reconciliation.
 - **MenuBarController** owns one native status item, one native popover, one shared dropdown view model, label updates, popover anchoring, and coalesced content-size changes.
 - **Task** stores durable timer and daily-workspace state. `currentElapsed(at:)` derives live elapsed time from timestamps.
 - **LocalDay** provides stable local-calendar keys and DST-safe day arithmetic.
 
-The app uses Swift 6, SwiftUI, SwiftData, Observation, and the small amount of AppKit required for `NSStatusItem`, `NSPopover`, sleep/wake notifications, and the native save panel.
+The app uses Swift 6, SwiftUI, SwiftData, Observation, and the small amount of AppKit required for `NSStatusItem`, `NSPopover`, wake notifications, and the native save panel.
 
 ## Project structure
 
@@ -181,7 +181,7 @@ FocusStationTests/
 └── FocusStationTests.swift
 ```
 
-The production target contains 18 Swift files, `Info.plist`, and the complete macOS app-icon asset catalog. The test target contains 65 tests covering the model, timer service, view model, layout calculations, status-bar content, CSV export, day boundaries, and adversarial rendering/state scenarios.
+The production target contains 18 Swift files, `Info.plist`, and the complete macOS app-icon asset catalog. The test target contains 66 tests covering the model, timer service, view model, layout calculations, status-bar content, CSV export, day boundaries, lifecycle behavior, and adversarial rendering/state scenarios.
 
 ## Development
 
@@ -220,7 +220,7 @@ rg -n 'URLSession|https?://' FocusStation -g '*.swift'
 rg -n '[A-Za-z0-9_\)\]]!(?![=])' FocusStation -g '*.swift' -P
 ```
 
-Every search should return no matches. The final verified suite executes 65 tests with zero failures.
+Every search should return no matches. The final verified suite executes 66 tests with zero failures.
 
 ## Release packaging
 

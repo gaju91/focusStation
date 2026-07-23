@@ -24,7 +24,7 @@ private struct TaskElapsedMetadataView: View {
         HStack(spacing: 4) {
             Text(TimeFormatter.format(task.currentElapsed()))
                 .fontDesign(.monospaced)
-                .foregroundStyle(isOvertime ? .red : .secondary)
+                .foregroundStyle(elapsedColor)
 
             if let target = task.targetTime, target > 0 {
                 Text("/")
@@ -38,9 +38,15 @@ private struct TaskElapsedMetadataView: View {
         .lineLimit(1)
     }
 
-    private var isOvertime: Bool {
-        guard let target = task.targetTime, target > 0 else { return false }
-        return task.currentElapsed() > target
+    private var elapsedColor: Color {
+        switch task.elapsedTone() {
+        case .withinLimit:
+            return .green
+        case .paused:
+            return .orange
+        case .overdue:
+            return .red
+        }
     }
 
 }

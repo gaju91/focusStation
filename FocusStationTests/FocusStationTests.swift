@@ -606,10 +606,19 @@ final class StatusBarContentTests: XCTestCase {
             accumulatedElapsed: 601,
             targetTime: 600
         )
+        let pausedOverdue = Task(
+            name: "Paused overdue",
+            accumulatedElapsed: 601,
+            targetTime: 600
+        )
 
-        XCTAssertEqual(StatusBarContent.elapsedTone(for: running), .running)
+        XCTAssertEqual(StatusBarContent.elapsedTone(for: running), .withinLimit)
         XCTAssertEqual(StatusBarContent.elapsedTone(for: paused), .paused)
         XCTAssertEqual(StatusBarContent.elapsedTone(for: overdue), .overdue)
+        XCTAssertEqual(
+            StatusBarContent.elapsedTone(for: pausedOverdue),
+            .overdue
+        )
     }
 }
 
@@ -952,6 +961,33 @@ final class AdversarialTimerManagerTests: XCTestCase {
 
         XCTAssertEqual(task.accumulatedElapsed, elapsed, accuracy: 0.001)
         XCTAssertFalse(task.isRunning)
+    }
+
+    func testMacSleepNotificationDoesNotPauseRunningTask() throws {
+        let (container, manager) = try makeManager()
+        _ = container
+        let task = manager.createTask(
+            name: "Sleep-proof runner",
+            iconName: IconProvider.defaultIcon,
+            targetTime: nil,
+            displayOrder: nil,
+            scheduledDayKey: LocalDay.today.key,
+            lineageID: nil
+        )
+        let startedAt = Date().addingTimeInterval(-300)
+        task.accumulatedElapsed = 60
+        task.isRunning = true
+        task.startedAt = startedAt
+        try manager.modelContext.save()
+
+        NSWorkspace.shared.notificationCenter.post(
+            name: NSWorkspace.willSleepNotification,
+            object: nil
+        )
+
+        XCTAssertTrue(task.isRunning)
+        XCTAssertEqual(task.startedAt, startedAt)
+        XCTAssertGreaterThanOrEqual(task.currentElapsed(), 360)
     }
 
     func testClearAllDataRemovesTasksAndArchivedDays() throws {

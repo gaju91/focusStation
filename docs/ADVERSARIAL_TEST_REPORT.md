@@ -1,6 +1,6 @@
 # FocusStation Adversarial Test Report
 
-Date: 20 July 2026
+Date: 23 July 2026
 Result: PASS after fixes
 
 ## Scope
@@ -32,8 +32,8 @@ modified.
 
 ## Stress Evidence
 
-- 65 distinct automated tests passed.
-- The complete suite passed three consecutive iterations: 195/195 executions.
+- 66 distinct automated tests passed.
+- The complete suite passed two consecutive clean-build iterations: 132/132 executions.
 - 4,001 calendar offsets round-tripped per iteration without date drift.
 - 1,000 deterministic randomized reorder operations per iteration preserved all
   100 task identities exactly once.
@@ -65,6 +65,10 @@ modified.
    capacity, batches preflight atomically, and duplicate lineages are ignored.
 7. The one-task header said “1 tasks.” Singular/plural grammar is now correct.
 8. A stale unused binding produced a compiler warning. It was removed.
+9. macOS sleep paused active work despite timestamp-based elapsed tracking, and
+   elapsed colors differed between surfaces. Sleep now preserves the running
+   session, wake still enforces midnight, and one shared rule renders green
+   within limit, orange when paused, and red when overdue.
 
 ## Guardrails and Limitations
 

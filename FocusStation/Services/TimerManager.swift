@@ -174,7 +174,7 @@ final class TimerManager: TimerManagerProtocol {
         errorMessage = nil
     }
 
-    /// Pauses every active task in one persistence transaction, used before sleep.
+    /// Pauses every active task in one persistence transaction when the app quits.
     func pauseAllRunningTasks() {
         var changed = false
         for task in tasks where task.isRunning {

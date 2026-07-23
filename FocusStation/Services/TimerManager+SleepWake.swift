@@ -1,15 +1,11 @@
 import AppKit
 
 extension TimerManager {
-    /// Start observing sleep/wake notifications.
+    /// Observe wake notifications so a task that crossed midnight while the Mac
+    /// slept is capped at its scheduled day boundary. Same-day sleep deliberately
+    /// leaves the timestamp-based timer running.
     /// Called once from TimerManager.init.
     func observeSleepWake() {
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(handleSleep),
-            name: NSWorkspace.willSleepNotification,
-            object: nil
-        )
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(handleWake),
@@ -21,10 +17,6 @@ extension TimerManager {
     /// Stop observing workspace notifications before the service is released.
     func stopObservingSleepWake() {
         NSWorkspace.shared.notificationCenter.removeObserver(self)
-    }
-
-    @objc private func handleSleep() {
-        pauseAllRunningTasks()
     }
 
     @objc private func handleWake() {

@@ -27,7 +27,6 @@ struct StatusBarLabelView: View {
     private func runningRow(for task: Task) -> some View {
         let elapsed = task.currentElapsed()
         let hasTarget = (task.targetTime ?? 0) > 0
-        let isOvertime = hasTarget && elapsed > (task.targetTime ?? 0)
 
         HStack(spacing: 4) {
             taskIcon(task)
@@ -40,7 +39,7 @@ struct StatusBarLabelView: View {
             if elapsed > 0 {
                 Text(TimeFormatter.format(elapsed))
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isOvertime ? .red : .green)
+                    .foregroundStyle(elapsedColor(for: task))
                     .fixedSize()
                 if hasTarget {
                     Text("/")
@@ -59,8 +58,6 @@ struct StatusBarLabelView: View {
 
     @ViewBuilder
     private func pausedRow(for task: Task) -> some View {
-        let isOvertime = (task.targetTime ?? 0) > 0 && task.accumulatedElapsed > (task.targetTime ?? 0)
-
         HStack(spacing: 4) {
             taskIcon(task)
             Text(task.name)
@@ -72,7 +69,7 @@ struct StatusBarLabelView: View {
             if task.accumulatedElapsed > 0 {
                 Text(TimeFormatter.format(task.accumulatedElapsed))
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isOvertime ? .red : .orange)
+                    .foregroundStyle(elapsedColor(for: task))
                     .fixedSize()
             }
         }
@@ -83,5 +80,16 @@ struct StatusBarLabelView: View {
         Image(systemName: task.iconName)
             .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(.primary)
+    }
+
+    private func elapsedColor(for task: Task) -> Color {
+        switch task.elapsedTone() {
+        case .withinLimit:
+            return .green
+        case .paused:
+            return .orange
+        case .overdue:
+            return .red
+        }
     }
 }

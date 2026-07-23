@@ -56,12 +56,6 @@ private enum StatusBarLayout {
 
 /// Produces stable menu-bar content while keeping the timer suffix visible.
 enum StatusBarContent {
-    enum ElapsedTone: Equatable {
-        case running
-        case paused
-        case overdue
-    }
-
     static func displayedTask(in tasks: [Task]) -> Task? {
         tasks.first(where: { $0.displayState == .running })
             ?? tasks.first(where: { $0.displayState == .paused })
@@ -79,12 +73,8 @@ enum StatusBarContent {
         return text
     }
 
-    static func elapsedTone(for task: Task) -> ElapsedTone {
-        let elapsed = task.currentElapsed()
-        if let target = task.targetTime, target > 0, elapsed > target {
-            return .overdue
-        }
-        return task.displayState == .running ? .running : .paused
+    static func elapsedTone(for task: Task) -> Task.ElapsedTone {
+        task.elapsedTone()
     }
 }
 
@@ -388,8 +378,10 @@ final class MenuBarController {
         switch StatusBarContent.elapsedTone(for: task) {
         case .overdue:
             return .systemRed
-        case .running, .paused:
+        case .paused:
             return .systemOrange
+        case .withinLimit:
+            return .systemGreen
         }
     }
 
