@@ -13,6 +13,12 @@ then paste the generated playable video attachment directly below this comment.
 
 _Complete walkthrough: create, edit, time, complete, delete, review, export, carry, plan ahead, and reorder tasks._
 
+
+
+https://github.com/user-attachments/assets/b700279c-8f47-4ae6-a9ca-c301f86500f2
+
+
+
 [![Project status](https://img.shields.io/badge/status-complete-2ea44f)](#project-status)
 [![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)](https://swift.org)
 [![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-blue)](https://developer.apple.com/xcode/swiftui/)
