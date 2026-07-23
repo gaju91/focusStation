@@ -35,17 +35,22 @@ struct StatusBarLabelView: View {
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
+                .truncationMode(.tail)
+                .help(task.name)
             if elapsed > 0 {
                 Text(TimeFormatter.format(elapsed))
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(isOvertime ? .red : .green)
+                    .fixedSize()
                 if hasTarget {
                     Text("/")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.primary.opacity(0.75))
+                        .fixedSize()
                     Text(TimeFormatter.format(task.targetTime ?? 0))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.primary.opacity(0.75))
+                        .fixedSize()
                 }
             }
         }
@@ -62,10 +67,13 @@ struct StatusBarLabelView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
+                .truncationMode(.tail)
+                .help(task.name)
             if task.accumulatedElapsed > 0 {
                 Text(TimeFormatter.format(task.accumulatedElapsed))
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(isOvertime ? .red : .orange)
+                    .fixedSize()
             }
         }
         .padding(.horizontal, 6)

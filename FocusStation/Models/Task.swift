@@ -15,6 +15,8 @@ final class Task: Identifiable {
     var startedAt: Date?
     var targetTime: TimeInterval?
     var createdAt: Date
+    var scheduledDayKey: String?
+    var lineageID: UUID?
 
     init(
         name: String,
@@ -25,7 +27,9 @@ final class Task: Identifiable {
         displayOrder: Int = 0,
         startedAt: Date? = nil,
         targetTime: TimeInterval? = nil,
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        scheduledDayKey: String? = nil,
+        lineageID: UUID? = nil
     ) {
         self.id = UUID()
         self.name = name
@@ -37,14 +41,42 @@ final class Task: Identifiable {
         self.startedAt = startedAt
         self.targetTime = targetTime
         self.createdAt = createdAt
+        self.scheduledDayKey = scheduledDayKey
+        self.lineageID = lineageID
     }
 
     /// Live elapsed time — accumulated + current session if running.
-    func currentElapsed() -> TimeInterval {
+    func currentElapsed(at date: Date = .now) -> TimeInterval {
+        let safeAccumulated = accumulatedElapsed.isFinite
+            ? max(0, accumulatedElapsed)
+            : 0
         guard isRunning, let startedAt else {
-            return accumulatedElapsed
+            return safeAccumulated
         }
-        return accumulatedElapsed + Date.now.timeIntervalSince(startedAt)
+        let sessionElapsed = date.timeIntervalSince(startedAt)
+        guard sessionElapsed.isFinite else { return safeAccumulated }
+        return safeAccumulated + max(0, sessionElapsed)
+    }
+
+    /// Whether the task was created before the current local calendar day.
+    func wasCreatedBeforeToday(
+        on date: Date = .now,
+        calendar: Calendar = .current
+    ) -> Bool {
+        calendar.startOfDay(for: createdAt) < calendar.startOfDay(for: date)
+    }
+
+    /// Whether this task belongs to a daily workspace, with legacy tasks treated as Today.
+    func isScheduled(
+        on day: LocalDay,
+        today: LocalDay = .today
+    ) -> Bool {
+        (scheduledDayKey ?? today.key) == day.key
+    }
+
+    /// Stable identifier shared by copies of the same work across daily workspaces.
+    var effectiveLineageID: UUID {
+        lineageID ?? id
     }
 
     /// Derived display state from running/completed/accumulated flags.

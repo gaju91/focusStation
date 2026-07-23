@@ -18,6 +18,8 @@ DerivedData/
 *.dmg
 *.pkg
 build/
+*.zip
+*.profraw
 
 # Swift Package Manager
 .build/

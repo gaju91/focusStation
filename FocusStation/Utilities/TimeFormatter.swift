@@ -4,14 +4,13 @@ import Foundation
 /// Omits zero components for compact display.
 enum TimeFormatter {
     static func format(_ interval: TimeInterval) -> String {
-        let totalSeconds = max(0, Int(interval))
+        guard interval.isFinite, interval > 0 else { return "0m" }
+        let maximumDisplaySeconds = TimeInterval(999 * 3600 + 3599)
+        guard interval <= maximumDisplaySeconds else { return "999h+" }
+        let totalSeconds = Int(interval)
         let hours = totalSeconds / 3600
         let minutes = (totalSeconds % 3600) / 60
         let seconds = totalSeconds % 60
-
-        if hours >= 24 {
-            return "24h+"
-        }
 
         if hours > 0 && minutes > 0 {
             return String(format: "%dh%02dm", hours, minutes)

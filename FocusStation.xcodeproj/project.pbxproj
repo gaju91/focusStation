@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		AAA000000000000000000001 /* FocusStationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000010 /* FocusStationApp.swift */; };
 		AAA000000000000000000002 /* ModelContainer+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000011 /* ModelContainer+App.swift */; };
-		AAA000000000000000000003 /* EnvironmentKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000012 /* EnvironmentKeys.swift */; };
 		AAA000000000000000000004 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000013 /* Task.swift */; };
 		AAA000000000000000000005 /* Day.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000014 /* Day.swift */; };
 		AAA000000000000000000006 /* TimerManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000015 /* TimerManagerProtocol.swift */; };
@@ -17,7 +16,6 @@
 		AAA000000000000000000008 /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000017 /* TimeFormatter.swift */; };
 		AAA000000000000000000009 /* IconProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000018 /* IconProvider.swift */; };
 
-		AAA000000000000000000038 /* MenuBarLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000039 /* MenuBarLabelView.swift */; };
 		AAA000000000000000000070 /* DropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000071 /* DropdownView.swift */; };
 		AAA000000000000000000072 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000073 /* TaskRowView.swift */; };
 		AAA000000000000000000074 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA000000000000000000075 /* EmptyStateView.swift */; };
@@ -28,12 +26,24 @@
 		EEE000000000000000000003 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000004 /* MenuBarController.swift */; };
 		EEE000000000000000000005 /* MenuBarContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000006 /* MenuBarContainerView.swift */; };
 		EEE000000000000000000007 /* StatusBarLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE000000000000000000008 /* StatusBarLabelView.swift */; };
+		F20000000000000000000001 /* DailyWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002 /* DailyWorkspace.swift */; };
+		F10000000000000000000001 /* FocusStationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000002 /* FocusStationTests.swift */; };
+		A1C000000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1C000000000000000000002 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F10000000000000000000008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAA000000000000000000050 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAA000000000000000000040;
+			remoteInfo = FocusStation;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		AAA000000000000000000010 /* FocusStationApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusStationApp.swift; sourceTree = "<group>"; };
 		AAA000000000000000000011 /* ModelContainer+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModelContainer+App.swift"; sourceTree = "<group>"; };
-		AAA000000000000000000012 /* EnvironmentKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentKeys.swift; sourceTree = "<group>"; };
 		AAA000000000000000000013 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		AAA000000000000000000014 /* Day.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Day.swift; sourceTree = "<group>"; };
 		AAA000000000000000000015 /* TimerManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManagerProtocol.swift; sourceTree = "<group>"; };
@@ -43,7 +53,6 @@
 		AAA000000000000000000019 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAA000000000000000000020 /* FocusStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 
-		AAA000000000000000000039 /* MenuBarLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabelView.swift; sourceTree = "<group>"; };
 		AAA000000000000000000071 /* DropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownView.swift; sourceTree = "<group>"; };
 		AAA000000000000000000073 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
 		AAA000000000000000000075 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
@@ -54,6 +63,10 @@
 		EEE000000000000000000004 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		EEE000000000000000000006 /* MenuBarContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContainerView.swift; sourceTree = "<group>"; };
 		EEE000000000000000000008 /* StatusBarLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarLabelView.swift; sourceTree = "<group>"; };
+		F20000000000000000000002 /* DailyWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyWorkspace.swift; sourceTree = "<group>"; };
+		F10000000000000000000002 /* FocusStationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusStationTests.swift; sourceTree = "<group>"; };
+		F10000000000000000000003 /* FocusStationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusStationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1C000000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -61,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA000000000000000000022 /* FocusStation */,
+				F10000000000000000000004 /* FocusStationTests */,
 				AAA000000000000000000030 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,7 +98,6 @@
 			children = (
 				AAA000000000000000000010 /* FocusStationApp.swift */,
 				AAA000000000000000000011 /* ModelContainer+App.swift */,
-				AAA000000000000000000012 /* EnvironmentKeys.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -115,6 +128,7 @@
 			children = (
 				AAA000000000000000000017 /* TimeFormatter.swift */,
 				AAA000000000000000000018 /* IconProvider.swift */,
+				F20000000000000000000002 /* DailyWorkspace.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -122,6 +136,7 @@
 		AAA000000000000000000027 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A1C000000000000000000002 /* Assets.xcassets */,
 				AAA000000000000000000019 /* Info.plist */,
 			);
 			path = Resources;
@@ -148,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA000000000000000000020 /* FocusStation.app */,
+				F10000000000000000000003 /* FocusStationTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,7 +171,6 @@
 		AAA000000000000000000031 /* MenuBar */ = {
 			isa = PBXGroup;
 			children = (
-				AAA000000000000000000039 /* MenuBarLabelView.swift */,
 				EEE000000000000000000006 /* MenuBarContainerView.swift */,
 				EEE000000000000000000008 /* StatusBarLabelView.swift */,
 			);
@@ -172,6 +187,14 @@
 			path = Dropdown;
 			sourceTree = "<group>";
 		};
+		F10000000000000000000004 /* FocusStationTests */ = {
+			isa = PBXGroup;
+			children = (
+				F10000000000000000000002 /* FocusStationTests.swift */,
+			);
+			path = FocusStationTests;
+			sourceTree = "<group>";
+		};
 
 
 /* End PBXGroup section */
@@ -182,6 +205,7 @@
 			buildConfigurationList = AAA000000000000000000045 /* Build configuration list for PBXNativeTarget "FocusStation" */;
 			buildPhases = (
 				AAA000000000000000000041 /* Sources */,
+				A1C000000000000000000003 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -191,6 +215,22 @@
 			productName = FocusStation;
 			productReference = AAA000000000000000000020 /* FocusStation.app */;
 			productType = "com.apple.product-type.application";
+		};
+		F10000000000000000000005 /* FocusStationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1000000000000000000000B /* Build configuration list for PBXNativeTarget "FocusStationTests" */;
+			buildPhases = (
+				F10000000000000000000006 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F10000000000000000000007 /* PBXTargetDependency */,
+			);
+			name = FocusStationTests;
+			productName = FocusStationTests;
+			productReference = F10000000000000000000003 /* FocusStationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -221,9 +261,21 @@
 			projectRoot = "";
 			targets = (
 				AAA000000000000000000040 /* FocusStation */,
+				F10000000000000000000005 /* FocusStationTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1C000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1C000000000000000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AAA000000000000000000041 /* Sources */ = {
@@ -232,14 +284,12 @@
 			files = (
 				AAA000000000000000000001 /* FocusStationApp.swift in Sources */,
 				AAA000000000000000000002 /* ModelContainer+App.swift in Sources */,
-				AAA000000000000000000003 /* EnvironmentKeys.swift in Sources */,
 				AAA000000000000000000004 /* Task.swift in Sources */,
 				AAA000000000000000000005 /* Day.swift in Sources */,
 				AAA000000000000000000006 /* TimerManagerProtocol.swift in Sources */,
 				AAA000000000000000000007 /* TimerManager.swift in Sources */,
 				AAA000000000000000000008 /* TimeFormatter.swift in Sources */,
 				AAA000000000000000000009 /* IconProvider.swift in Sources */,
-				AAA000000000000000000038 /* MenuBarLabelView.swift in Sources */,
 				AAA000000000000000000070 /* DropdownView.swift in Sources */,
 				AAA000000000000000000072 /* TaskRowView.swift in Sources */,
 				AAA000000000000000000074 /* EmptyStateView.swift in Sources */,
@@ -250,10 +300,27 @@
 				EEE000000000000000000003 /* MenuBarController.swift in Sources */,
 				EEE000000000000000000005 /* MenuBarContainerView.swift in Sources */,
 				EEE000000000000000000007 /* StatusBarLabelView.swift in Sources */,
+				F20000000000000000000001 /* DailyWorkspace.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F10000000000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F10000000000000000000001 /* FocusStationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F10000000000000000000007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AAA000000000000000000040 /* FocusStation */;
+			targetProxy = F10000000000000000000008 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AAA000000000000000000060 /* Debug - Project */ = {
@@ -322,7 +389,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -333,7 +400,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.focusstation.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -350,7 +417,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -361,12 +428,44 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.focusstation.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		F10000000000000000000009 /* Debug - Tests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focusstation.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusStation.app/Contents/MacOS/FocusStation";
+			};
+			name = Debug;
+		};
+		F1000000000000000000000A /* Release - Tests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focusstation.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusStation.app/Contents/MacOS/FocusStation";
 			};
 			name = Release;
 		};
@@ -387,6 +486,15 @@
 			buildConfigurations = (
 				AAA000000000000000000062 /* Debug - Target */,
 				AAA000000000000000000063 /* Release - Target */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1000000000000000000000B /* Build configuration list for PBXNativeTarget "FocusStationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F10000000000000000000009 /* Debug - Tests */,
+				F1000000000000000000000A /* Release - Tests */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

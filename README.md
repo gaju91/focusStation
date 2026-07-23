@@ -1,368 +1,253 @@
 <p align="center">
-  <img src="docs/focusStation_Desktop_View.png" alt="FocusStation Desktop View" width="800">
+  <img src="docs/focusStation_Desktop_View.png" alt="FocusStation running from the macOS menu bar" width="800">
 </p>
 
 # FocusStation
 
-**A native macOS menu bar task timer. Track your time, stay focused — zero friction.**
+**A native, day-specific macOS menu bar task timer for planning realistic work and staying focused.**
 
+[![Project status](https://img.shields.io/badge/status-complete-2ea44f)](#project-status)
 [![Swift 6](https://img.shields.io/badge/Swift-6.0-orange)](https://swift.org)
 [![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-blue)](https://developer.apple.com/xcode/swiftui/)
 [![SwiftData](https://img.shields.io/badge/Persistence-SwiftData-green)](https://developer.apple.com/xcode/swiftdata/)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-silver)](https://developer.apple.com/macos/)
+[![Tests](https://img.shields.io/badge/tests-65%20passing-2ea44f)](#test-and-verify)
 [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
-FocusStation lives in your Mac's menu bar. Add tasks, start a timer, and your progress is always one glance away. No accounts, no cloud, no complexity — just you and your work.
+FocusStation lives entirely in the Mac menu bar. Plan tasks on a calendar day, give them optional time budgets, work on one task at a time, review previous days, deliberately carry unfinished work forward, and export the history as CSV.
 
----
+No account. No cloud. No analytics. No networking. No third-party dependencies.
+
+## Project status
+
+**FocusStation is feature-complete for its intended scope.**
+
+The product is not trying to become a project manager, calendar, team tracker, billing system, or Pomodoro suite. Its finished job is narrower: help one person plan a realistic day, see the current focus in the menu bar, preserve an accurate history, and make unfinished work an explicit decision.
+
+Maintenance, compatibility fixes, security fixes, and small usability improvements may continue. New feature work should protect the one-second, menu-bar-first workflow.
 
 ## Install
 
-1. Download the latest `FocusStation-v*.zip` from [Releases](https://github.com/gaju91/focusStation/releases/latest)
-2. Unzip and drag `FocusStation.app` to `/Applications`
-3. **First launch:** right-click → **Open**. If that doesn't work, run `xattr -cr /Applications/FocusStation.app` in Terminal, then open normally.
+1. Download the latest ZIP from [GitHub Releases](https://github.com/gaju91/focusStation/releases/latest).
+2. Unzip it and move `FocusStation.app` to `/Applications`.
+3. On first launch, right-click the app and choose **Open**. If Gatekeeper still blocks it, run:
 
----
+```bash
+xattr -cr /Applications/FocusStation.app
+```
 
-## Screenshots
+4. Open FocusStation and look for the brain icon in the menu bar.
 
-<p align="center">
-  <img src="docs/focusStation_Focus_View.png" alt="Focus View" width="400">
-</p>
+## What the completed app does
 
----
+### Daily workspaces
 
-## Usage
+- The header is a compact date carousel.
+- **Today** supports the complete workflow: create, edit, reorder, time, complete, delete, carry, and repeat.
+- **Future dates** support planning and reordering, but timers and completion remain disabled until that date arrives.
+- **Past dates** are read-only history.
+- Targets are limited by the actual remaining capacity of the selected local calendar day.
+- Calendar arithmetic respects time zones, leap days, and 23/24/25-hour daylight-saving days.
 
-- **Add a task:** click "Add Task", type a name, set optional target hours/minutes, hit Save
-- **Start tracking:** click ▶ on any task — only one timer runs at a time
-- **Menu bar glance:** active task name + elapsed / target visible without opening the popover
-- **Edit inline:** hover a row → pencil icon → edit name or target
-- **Reorder:** drag rows via the handle
+### Focus timer
 
----
+- Only one task can run at a time; starting or resuming another task automatically pauses the current one.
+- Elapsed time is derived from timestamps, never from an incrementing counter.
+- A running task is capped at the end of its scheduled local day.
+- FocusStation pauses running work before the Mac sleeps and when the app quits, preventing accidental sleep time from being recorded.
+- Completion preserves elapsed time and keeps the task in its current list position with a green check and strikethrough.
+
+### Menu bar
+
+- Idle state is the brain icon only.
+- Running or paused state shows the task icon, a tail-truncated name, elapsed time, and an optional target.
+- Elapsed time is orange while within the target and red when overdue.
+- The full task, state, and time remain available through the native tooltip.
+- The status item is capped at 260 pt and the popover anchor follows the center of its current width.
+
+### Compact popover
+
+- Stable width: 340 pt.
+- Content-driven height: 188–480 pt.
+- Rows keep fixed control columns, so hover actions never shift the task text.
+- Long names use up to two lines before tail truncation and expose the full name as help text.
+- Edit and delete controls appear on hover and are also available through the context menu.
+- All primary controls have 28×28 pt hit regions, accessibility labels, and native help text.
+- Large lists scroll without a permanently visible scrollbar.
+
+### Inline create and edit
+
+- New and existing tasks use the same 76 pt inline editor.
+- The name field receives focus immediately and shows a visible focus ring.
+- Optional hour/minute controls set the target.
+- `Return` saves, `Escape` cancels, and `⌘N` creates a new task.
+- A save is atomic and closes the editor on the first interaction; stale field callbacks cannot restore or duplicate it.
+
+### Carry, repeat, and history
+
+- Unfinished work never resets or silently moves at midnight.
+- **Carry** creates a task on the next applicable day with zero elapsed time and only the remaining target estimate.
+- **Repeat** creates fresh work with the original full target.
+- Lineage tracking prevents duplicate copies from repeated carry/repeat actions.
+- Batch carry preflights destination capacity and is atomic: either every eligible task is copied or none are.
+- The export menu writes either the selected day or all history through the native macOS save panel.
+- CSV output is deterministic, RFC-style escaped, and neutralizes spreadsheet-formula prefixes.
+
+## Keyboard and pointer reference
+
+| Action | Control |
+|---|---|
+| Open FocusStation | Click the menu-bar item |
+| New task | `⌘N` or **New Task** |
+| Save editor | `Return` or **Save** |
+| Cancel editor | `Escape` or **Cancel** |
+| Edit or delete | Hover the task row |
+| Carry or repeat one task | Right-click the task row |
+| Reorder | Drag the row |
+| Change date | Header arrows or horizontal swipe |
+| Return to Today | Click an off-date title |
+| Export history | Header export icon |
+| Quit | Header `×` button |
+
+## Architecture
+
+```text
+SwiftUI views
+    ↓
+DropdownViewModel (@Observable)
+    ↓ protocol dependency
+TimerManager
+    ↓
+SwiftData (local on-disk store)
+
+TickGenerator ──→ MenuBarController ──→ NSStatusItem + NSPopover
+```
+
+- **Views** render state and forward user intent. They do not access SwiftData.
+- **DropdownViewModel** owns the selected day, inline editor state, grouping, capacity validation, carry/repeat orchestration, and export preparation.
+- **TimerManager** is the mutation boundary for timers, CRUD, ordering, sleep handling, legacy migration, and day-boundary reconciliation.
+- **MenuBarController** owns one native status item, one native popover, one shared dropdown view model, label updates, popover anchoring, and coalesced content-size changes.
+- **Task** stores durable timer and daily-workspace state. `currentElapsed(at:)` derives live elapsed time from timestamps.
+- **LocalDay** provides stable local-calendar keys and DST-safe day arithmetic.
+
+The app uses Swift 6, SwiftUI, SwiftData, Observation, and the small amount of AppKit required for `NSStatusItem`, `NSPopover`, sleep/wake notifications, and the native save panel.
+
+## Project structure
+
+```text
+FocusStation/
+├── App/
+│   ├── FocusStationApp.swift
+│   └── ModelContainer+App.swift
+├── Models/
+│   ├── Task.swift
+│   └── Day.swift
+├── Services/
+│   ├── MenuBarController.swift
+│   ├── TickGenerator.swift
+│   ├── TimerManager.swift
+│   ├── TimerManager+SleepWake.swift
+│   └── TimerManagerProtocol.swift
+├── Utilities/
+│   ├── DailyWorkspace.swift
+│   ├── IconProvider.swift
+│   └── TimeFormatter.swift
+├── ViewModels/
+│   └── DropdownViewModel.swift
+├── Views/
+│   ├── Dropdown/
+│   │   ├── DropdownView.swift
+│   │   ├── EmptyStateView.swift
+│   │   └── TaskRowView.swift
+│   └── MenuBar/
+│       ├── MenuBarContainerView.swift
+│       └── StatusBarLabelView.swift
+└── Resources/
+    └── Info.plist
+
+FocusStationTests/
+└── FocusStationTests.swift
+```
+
+The production target contains 18 Swift files plus `Info.plist`. The test target contains 65 tests covering the model, timer service, view model, layout calculations, status-bar content, CSV export, day boundaries, and adversarial rendering/state scenarios.
 
 ## Development
 
 ### Requirements
 
-- macOS 14 (Sonoma) or later
+- macOS 14 Sonoma or later
 - Xcode 16 or later
+- No package manager or third-party dependency installation
 
 ### Build
 
 ```bash
-git clone https://github.com/gaju91/focusStation.git
-cd focusStation
-xcodebuild -project FocusStation.xcodeproj -scheme FocusStation -configuration Debug build
-open ~/Library/Developer/Xcode/DerivedData/FocusStation-*/Build/Products/Debug/FocusStation.app
+xcodebuild \
+  -project FocusStation.xcodeproj \
+  -scheme FocusStation \
+  -configuration Debug \
+  -derivedDataPath /tmp/FocusStationDerivedData \
+  clean build
 ```
 
-**That's it.** Zero dependencies. Zero package managers. Zero third-party code.
-
-### Release
-
-Follow these steps to create a distributable ZIP. Each step builds on the previous one.
-
-**1. Clean previous builds**
-
-Removes any stale build artifacts so the new build starts fresh.
+### Test and verify
 
 ```bash
-rm -rf build/Release
+xcodebuild test \
+  -project FocusStation.xcodeproj \
+  -scheme FocusStation \
+  -destination 'platform=macOS' \
+  -derivedDataPath /tmp/FocusStationTests
+
+rg -n '@Published|ObservableObject|@StateObject' FocusStation -g '*.swift'
+rg -n 'elapsed \+= 1' FocusStation -g '*.swift'
+rg -n 'print\(' FocusStation -g '*.swift'
+rg -n 'Color\.black|Color\.white|Color\(red:|Color\(hex:' FocusStation -g '*.swift'
+rg -n 'import Combine|Combine\.' FocusStation -g '*.swift'
+rg -n 'URLSession|https?://' FocusStation -g '*.swift'
+rg -n '[A-Za-z0-9_\)\]]!(?![=])' FocusStation -g '*.swift' -P
 ```
 
-**2. Build the Release version of the app**
+Every search should return no matches. The final verified suite executes 65 tests with zero failures.
 
-This compiles the app with optimizations (no debug symbols).
+## Release packaging
 
 ```bash
-xcodebuild -project FocusStation.xcodeproj -scheme FocusStation -configuration Release CONFIGURATION_BUILD_DIR=build/Release build
+xcodebuild \
+  -project FocusStation.xcodeproj \
+  -scheme FocusStation \
+  -configuration Release \
+  CONFIGURATION_BUILD_DIR=build/Release \
+  build
+
+ditto -c -k --keepParent \
+  build/Release/FocusStation.app \
+  build/Release/FocusStation-vX.Y.Z.zip
 ```
 
-The compiled `.app` bundle lands at `build/Release/FocusStation.app`.
+FocusStation is currently distributed unsigned. Preserve the Gatekeeper note in release instructions until signing and notarization are actually configured.
 
-**3. Package as a ZIP**
+## Product boundaries
 
-This creates a single compressed file you can share. `ditto` preserves macOS metadata (permissions, code signature) which plain `zip` would strip.
+FocusStation intentionally does not include:
 
-```bash
-ditto -c -k --keepParent build/Release/FocusStation.app build/Release/FocusStation-vX.Y.Z.zip
-```
+- accounts or cloud sync;
+- networking or analytics;
+- collaboration or team reporting;
+- project hierarchies, Kanban, or calendar integration;
+- billing and timesheets;
+- AI features;
+- custom themes or third-party plugins.
 
-Replace `X.Y.Z` with the current version number.
+These are product constraints, not missing checklist items.
 
-**4. Tag the release**
+## Documentation
 
-This marks a point in Git history. Use [semantic versioning](https://semver.org): `MAJOR.MINOR.PATCH`. For example, `v0.1.0` for the first release, `v0.1.1` for a bug fix, `v0.2.0` for new features.
-
-```bash
-git tag vX.Y.Z
-git push origin vX.Y.Z
-```
-
-**5. Upload to GitHub**
-
-Go to [GitHub Releases](https://github.com/gaju91/focusStation/releases) → "Draft a new release":
-
-- **Tag:** select the tag you just pushed
-- **Title:** `FocusStation vX.Y.Z`
-- **Description:** a brief list of changes since the last release
-- **Attach:** drag `build/Release/FocusStation-vX.Y.Z.zip` (from step 3) into the binaries box
-- Click **Publish release**
-
-The ZIP is now publicly downloadable from the Releases page — anyone can install from `## Install` above.
-
----
-
-## Project Structure (19 files)
-
-```
-FocusStation/
-├── App/
-│   ├── FocusStationApp.swift         # @main — DI, dummy MenuBarExtra
-│   ├── ModelContainer+App.swift      # SwiftData schema + on-disk store
-│   └── EnvironmentKeys.swift         # @Entry for TimerManagerProtocol
-├── Models/
-│   ├── Task.swift                    # @Model: name, icon, timestamps, isRunning, displayState
-│   └── Day.swift                     # Archived day schema (forward compatibility)
-├── Services/
-│   ├── TimerManagerProtocol.swift    # 15-member contract for timer CRUD
-│   ├── TimerManager.swift            # @Observable timer engine + single-timer enforcement + CRUD
-│   ├── TimerManager+SleepWake.swift  # NSWorkspace sleep → pause all, wake → restart display
-│   ├── TickGenerator.swift           # @MainActor @Observable 1s tick source
-│   └── MenuBarController.swift       # NSStatusBar + NSPopover lifecycle + tick observation
-├── ViewModels/
-│   └── DropdownViewModel.swift       # @Observable — syncs tasks, exposes sortedTasks, CRUD passthrough
-├── Views/
-│   ├── MenuBar/
-│   │   ├── StatusBarLabelView.swift   # Running/Paused/Idle label with time and target
-│   │   ├── MenuBarLabelView.swift     # Bridges TickGenerator + timerManager
-│   │   └── MenuBarContainerView.swift # Typed NSHostingView wrapper (avoids AnyView)
-│   └── Dropdown/
-│       ├── DropdownView.swift         # Task list, inline task creation, inline editing
-│       ├── TaskRowView.swift          # Single row: checkbox, name, elapsed, action buttons, inline edit
-│       └── EmptyStateView.swift       # "No tasks yet" placeholder
-├── Utilities/
-│   ├── TimeFormatter.swift            # TimeInterval → "1h23m" / "45m" (omits zero components)
-│   └── IconProvider.swift             # 32 SF Symbol registry + default icon
-└── Resources/
-    └── Info.plist                     # LSUIElement = true (hide from Dock)
-```
-
----
-
-## Architecture
-
-### Pattern: MVVM + @Observable
-
-```
-┌──────────┐     reads      ┌──────────────┐     calls     ┌─────────────┐
-│   View   │ ←───────────── │  ViewModel   │ ────────────→ │   Service   │
-│ (SwiftUI)│                │ (@Observable)│               │(TimerManager)│
-└──────────┘                └──────────────┘               └──────┬──────┘
-                                                                  │
-                                                            reads/writes
-                                                                  │
-                                                            ┌─────▼──────┐
-                                                            │ SwiftData  │
-                                                            │ (on disk)  │
-                                                            └────────────┘
-```
-
-- **Views** render pixels. No business logic, no SwiftData access.
-- **ViewModels** (`@Observable` classes, import `Observation`) prepare data.
-- **Services** own state. `TimerManager` is the sole mutation point for tasks.
-- **Protocol DI** — ViewModels depend on `any TimerManagerProtocol`, never the concrete class. `NoOpTimerManager` serves as the `@Entry` default.
-
-### Timer Engine — Timestamp-Based, Zero Drift
-
-```swift
-func currentElapsed() -> TimeInterval {
-    guard isRunning, let startedAt else { return accumulatedElapsed }
-    return accumulatedElapsed + Date.now.timeIntervalSince(startedAt)
-}
-```
-
-- **No counters.** `elapsed += 1` never appears — that drifts and breaks on sleep.
-- **Started timestamp** recorded on start/resume. Paused captures elapsed into `accumulatedElapsed`.
-- **Live display** computed on every render: `accumulated + (now - startedAt)`.
-- **Sleep-safe** — on wake, the math accounts for elapsed wall-clock time automatically.
-- **Single-timer enforcement** — `TimerManager.start()` and `resume()` both call `pauseOtherRunningTasks(except:)`. Starting or resuming a task automatically pauses any currently running task. This is mandatory, not a toggle-able setting.
-
-### Menu Bar — NSStatusBar + NSPopover
-
-The initial `MenuBarExtra` approach was abandoned because SwiftUI clips label content. The current implementation uses:
-
-- `NSStatusBar.system.statusItem(withLength: .variableLength)` — shrinks to icon-only when idle, expands for active timers. No wasted space.
-- `NSHostingView<MenuBarContainerView>` — embedded SwiftUI inside the status button.
-- `NSPopover` with `.transient` behavior + `NSHostingController` — dropdown panel.
-- `TickGenerator` (`@Observable`, 1s selector-based timer on `RunLoop.main.common`) — drives `withObservationTracking` in `MenuBarController` to re-render the label each second without `@Sendable` closures.
-- **No explicit appearance override** — the `NSHostingView` inherits appearance from the status bar button, which automatically tracks light/dark theme.
-
-### Menu Bar Label States
-
-| State   | Display                                                         |
-| ------- | --------------------------------------------------------------- |
-| Running | `icon  Task Name  1h23m / 3h00m` (green elapsed, gray target) |
-| Paused  | `icon  Task Name  45m` (orange elapsed)                       |
-| Idle    | `icon` only                                                   |
-
-Running and paused rows share the same `.frame(minWidth: 140)` to prevent the status bar from resizing on pause/resume — only the color changes (green ↔ orange). The idle state uses `variableLength` so the status item shrinks to just the icon.
-
----
-
-## File Responsibility Guide
-
-### `App/`
-
-| File                         | Responsibility                                                                                                                                                                            |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FocusStationApp.swift`    | `@main` entry point. Creates `ModelContainer`, `TimerManager`, `TickGenerator`, `MenuBarController`. Renders a dummy `MenuBarExtra` (hidden) to satisfy the `App` protocol. |
-| `ModelContainer+App.swift` | Static`ModelContainer.appContainer` factory. Schema: `Task`, `Day`, `ArchivedTask`. On-disk store.                                                                                |
-| `EnvironmentKeys.swift`    | `@Entry var timerManager`. Defaults to `NoOpTimerManager`. Overridden via `.environment(\.timerManager, ...)`.                                                                      |
-
-### `Models/`
-
-| File           | Responsibility                                                                                                                                                                                                                                                                                  |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Task.swift` | `@Model` class. Properties: `name`, `iconName`, `isRunning`, `isCompleted`, `accumulatedElapsed`, `startedAt`, `targetTime`, `displayOrder`. `currentElapsed()` computed from timestamps. `displayState` derives `.running` / `.paused` / `.idle` / `.completed`. |
-| `Day.swift`  | `@Model` for archived daily snapshots + `ArchivedTask` frozen task state. Schema present for forward compatibility.                                                                                                                                                                         |
-
-### `Services/`
-
-| File                             | Responsibility                                                                                                                                                                                                                                                                                           |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TimerManagerProtocol.swift`   | 15-member`AnyObject` protocol. Contract for all timer mutations + task CRUD + reordering.                                                                                                                                                                                                              |
-| `TimerManager.swift`           | `@Observable` implementation. Owns `tasks: [Task]`, `modelContext`, display timer, `refreshTasks()`. `start`/`pause`/`resume` enforce single-timer via `pauseOtherRunningTasks(except:)`. `reorderTasks(_:)` for batch drag-and-drop reordering. `deinit` invalidates display timer. |
-| `TimerManager+SleepWake.swift` | `NSWorkspace` notification observers. On sleep: pause all running timers + invalidate display timer. On wake: restart display timer only (no auto-resume).                                                                                                                                             |
-| `TickGenerator.swift`          | `@MainActor @Observable`. Runs a 1s selector-based `Timer` on `RunLoop.main.common`. `value` incremented each tick — observed by `MenuBarController` to trigger label re-renders. Selector-based to avoid `@Sendable` warnings in Swift 6.                                                  |
-| `MenuBarController.swift`      | `@MainActor` class. Creates `NSStatusItem` (variableLength), `NSHostingView` for label, `NSPopover` for dropdown. Click toggle, `withObservationTracking` tick loop. Popover width computed from `fittingSize`. No explicit appearance override.                                             |
-
-### `ViewModels/`
-
-| File                        | Responsibility                                                                                                                                                                                                                                                                                 |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DropdownViewModel.swift` | `@Observable`. Syncs `tasks` from `timerManager` every 1s via selector-based sync timer. Exposes `sortedTasks` (running → paused → idle → completed by displayOrder). Handles all timer actions + CRUD passthrough + `reorderTasks(from:to:)`. `deinit` invalidates sync timer. |
-
-### `Views/MenuBar/`
-
-| File                           | Responsibility                                                                                                                                                                                                                                                                                 |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `StatusBarLabelView.swift`   | Renders menu bar label. Idle: brain icon only. Running: icon + name + elapsed / target. Paused: icon + name + elapsed. Uses`.foregroundStyle(.primary)` on icons and text for theme-agnostic rendering. Running/paused rows use `.frame(minWidth: 140)` to prevent resize on state change. |
-| `MenuBarLabelView.swift`     | Bridges`TickGenerator` + `timerManager` to `StatusBarLabelView` with `.id(tickGenerator.value)` for re-rendering.                                                                                                                                                                      |
-| `MenuBarContainerView.swift` | Concrete typed wrapper around`StatusBarLabelView`. Exists solely to avoid `AnyView` in `NSHostingView` (breaks `intrinsicContentSize`).                                                                                                                                                |
-
-### `Views/Dropdown/`
-
-| File                     | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DropdownView.swift`   | `NSPopover` content. Header ("FocusStation" + Quit button), scrollable task list with drag-to-reorder, inline pending task rows for batch creation, "Add Task" footer button. Contains `PendingTask` struct (name + hours + minutes) and `PendingTaskRowView` (inline form matching the edit-mode layout). Accent-colored separator between existing tasks and pending rows.                                                                                    |
-| `TaskRowView.swift`    | Single task row. Normal mode: completion checkbox, task name + elapsed/target time, action button (Start/Pause/Resume/Complete), hover-revealed pencil edit button, trash delete button. Edit mode: inline form identical to`PendingTaskRowView` — rounded-border name field + target h/m fields + checkmark save / x cancel buttons. Context menu for alternate actions. Double-clicking the name does nothing — use the pencil button or context menu "Rename". |
-| `EmptyStateView.swift` | Static placeholder shown when no tasks and no pending rows exist.                                                                                                                                                                                                                                                                                                                                                                                                     |
-
-### `Utilities/`
-
-| File                    | Responsibility                                                                                                                                        |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TimeFormatter.swift` | `static func format(TimeInterval) -> String`. Returns `"1h30m"`, `"45m"`, `"30s"`, `"0m"`. Omits zero components — never shows `"1h0m"`. |
-| `IconProvider.swift`  | 32 SF Symbol names.`defaultIcon = "brain.head.profile"`. `label(for:)` for human-readable display.                                                |
-
----
-
-## Guardrails
-
-These checks are enforced and must pass. Run locally before committing:
-
-```bash
-# Build must succeed
-xcodebuild -project FocusStation.xcodeproj -scheme FocusStation -configuration Debug build
-
-# No force unwraps (use guard let / if let)
-grep -rn '!' FocusStation/ --include='*.swift' | grep -v '!=' | grep -v 'fatalError' || echo "PASS"
-
-# No debug prints
-grep -rn 'print(' FocusStation/ --include='*.swift' || echo "PASS"
-
-# No counter-based timers (use timestamps)
-grep -rn 'elapsed += 1' FocusStation/ --include='*.swift' || echo "PASS"
-
-# No legacy property wrappers (use @Observable)
-grep -rn '@Published\|ObservableObject\|@StateObject' FocusStation/ --include='*.swift' || echo "PASS"
-
-# No hardcoded colors (use semantic: .primary, .secondary, .green, .orange, .accentColor)
-grep -rn 'Color\.black\|Color\.white\|Color(red:\|Color(hex:' FocusStation/ --include='*.swift' || echo "PASS"
-
-# No Combine (use @Observable + withObservationTracking)
-grep -rn 'import Combine\|Combine\.' FocusStation/ --include='*.swift' || echo "PASS"
-
-# No raw UserDefaults writes (use @AppStorage when needed)
-grep -rn 'UserDefaults.standard.set\|UserDefaults.standard.removeObject' FocusStation/ --include='*.swift' || echo "PASS"
-```
-
-### Must Always
-
-- `guard let` / `if let` — never force-unwrap
-- `@Observable` only — never `@Published` / `ObservableObject` / `@StateObject`
-- `currentElapsed()` = timestamp diff — never `elapsed += 1`
-- Semantic colors only — `.primary`, `.secondary`, `.green`, `.orange`, `.accentColor`
-- Imports sorted alphabetically: Foundation → SwiftData → SwiftUI → AppKit → Observation
-- `///` doc comments on every public type, method, and property
-- ViewModels import `Observation` (not `SwiftUI`)
-- Views import `SwiftUI` (and `AppKit` only when needed)
-
----
-
-## Troubleshooting
-
-| Issue                                                                 | Fix                                                                                                                                                                            |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **"Cannot be opened because the developer cannot be verified"** | Right-click the app → Open, or run`xattr -cr /Applications/FocusStation.app` in Terminal                                                                                    |
-| **App doesn't appear in menu bar**                              | Ensure the app is in`/Applications`. If your menu bar is crowded, the icon may be hidden — try closing other menu bar items or use [Bartender](https://www.macbartender.com) |
-| **Timers not counting**                                         | Click ▶ on a task to start the timer. Only one timer runs at a time — starting another pauses the current one                                                                |
-| **Tasks disappeared after restart**                             | Tasks persist via SwiftData — ensure the app quits normally (not force-quit)                                                                                                  |
-
----
-
-## Contributing
-
-1. Fork the repo
-2. Create a branch: `feature/your-feature` or `fix/your-bug`
-3. Write code following the conventions above
-4. Run all guardrail checks — they must pass
-5. Submit a PR with a clear description
-
-### Commit Style
-
-```
-area: short description in present tense
-
-- Bullet points for what changed
-- Reference issues if applicable
-```
-
-### Project Values
-
-- **Zero dependencies.** Everything uses Apple frameworks only.
-- **Local-only.** No networking. No analytics. No accounts.
-- **Timestamp-based timer.** Never increment a counter.
-- **Small surface area.** One responsibility per file. Clear ownership.
-
----
-
-## Tech Stack
-
-| Layer       | Technology                                                     |
-| ----------- | -------------------------------------------------------------- |
-| Language    | Swift 6                                                        |
-| UI          | SwiftUI (no AppKit views except NSStatusBar/NSPopover)         |
-| Persistence | SwiftData (on-disk, local only)                                |
-| Concurrency | `@MainActor` + `@Observable` + `withObservationTracking` |
-| Menu Bar    | `NSStatusBar` + `NSHostingView` (not MenuBarExtra)         |
-| Build       | Xcode 16, zero package dependencies                            |
-
----
+- [Complete user guide](https://gajanand.info/tools/focusstation/guide)
+- [Product page and download](https://gajanand.info/tools/focusstation)
+- [Build-in-public series](https://gajanand.info/build)
+- [Adversarial test report](docs/ADVERSARIAL_TEST_REPORT.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE).

@@ -5,52 +5,34 @@ import SwiftData
 @Observable
 final class TimerManager: TimerManagerProtocol {
     var tasks: [Task] = []
+    private(set) var errorMessage: String?
 
     let modelContext: ModelContext
-    private var displayTimer: Timer?
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         observeSleepWake()
         refreshTasks()
+        migrateLegacyTasksIfNeeded()
+        reconcileDayBoundary(at: .now)
     }
 
     deinit {
-        displayTimer?.invalidate()
+        stopObservingSleepWake()
     }
-
-    func startDisplayTimer() {
-        guard displayTimer == nil else { return }
-        let timer = Timer(
-            timeInterval: 1.0,
-            target: self,
-            selector: #selector(timerDidFire),
-            userInfo: nil,
-            repeats: true
-        )
-        RunLoop.main.add(timer, forMode: .common)
-        displayTimer = timer
-        displayTimer?.fire()
-    }
-
-    func stopDisplayTimer() {
-        displayTimer?.invalidate()
-        displayTimer = nil
-    }
-
-    /// Display timer heartbeat. No work needed — @Observable
-    /// accesses are driven externally via TickGenerator + TimelineView.
-    @objc private func timerDidFire() {}
 
     // MARK: Timer Actions
 
     func start(task: Task) {
-        guard !task.isRunning else { return }
+        guard
+            !task.isRunning,
+            !task.isCompleted,
+            task.isScheduled(on: .today)
+        else { return }
         pauseOtherRunningTasks(except: task)
         task.isRunning = true
         task.startedAt = .now
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
     func pause(task: Task) {
@@ -58,17 +40,19 @@ final class TimerManager: TimerManagerProtocol {
         task.accumulatedElapsed = task.currentElapsed()
         task.isRunning = false
         task.startedAt = nil
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
     func resume(task: Task) {
-        guard !task.isRunning else { return }
+        guard
+            !task.isRunning,
+            !task.isCompleted,
+            task.isScheduled(on: .today)
+        else { return }
         pauseOtherRunningTasks(except: task)
         task.isRunning = true
         task.startedAt = .now
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
     private func pauseOtherRunningTasks(except target: Task) {
@@ -81,86 +65,83 @@ final class TimerManager: TimerManagerProtocol {
 
     // MARK: Task CRUD
 
-    func createTask(name: String, iconName: String, targetTime: TimeInterval?, displayOrder: Int?) -> Task {
-        let order = displayOrder ?? -(Int(Date.now.timeIntervalSince1970))
-        let task = Task(name: name, iconName: iconName, displayOrder: order, targetTime: targetTime)
+    func createTask(
+        name: String,
+        iconName: String,
+        targetTime: TimeInterval?,
+        displayOrder: Int?,
+        scheduledDayKey: String,
+        lineageID: UUID?
+    ) -> Task {
+        let order = displayOrder ?? ((tasks.map(\.displayOrder).max() ?? -1) + 1)
+        let safeTarget = sanitizedTarget(targetTime)
+        let safeDayKey = LocalDay(key: scheduledDayKey)?.key ?? LocalDay.today.key
+        let task = Task(
+            name: name,
+            iconName: iconName,
+            displayOrder: order,
+            targetTime: safeTarget,
+            scheduledDayKey: safeDayKey,
+            lineageID: lineageID
+        )
         modelContext.insert(task)
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
         return task
     }
 
     func delete(task: Task) {
-        if task.isRunning {
-            pause(task: task)
-        }
         modelContext.delete(task)
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
     func complete(task: Task) {
         if task.isRunning {
-            pause(task: task)
+            task.accumulatedElapsed = task.currentElapsed()
+            task.isRunning = false
+            task.startedAt = nil
         }
         task.isCompleted = true
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
     func uncomplete(task: Task) {
         task.isCompleted = false
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
-    func updateName(of task: Task, to newName: String) {
-        let trimmed = newName.trimmingCharacters(in: .whitespaces)
+    func update(task: Task, name: String, targetTime: TimeInterval?) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         task.name = trimmed
-        try? modelContext.save()
-        refreshTasks()
-    }
-
-    func updateIcon(of task: Task, to iconName: String) {
-        task.iconName = iconName
-        try? modelContext.save()
-        refreshTasks()
-    }
-
-    func updateTargetTime(of task: Task, to targetTime: TimeInterval?) {
-        task.targetTime = targetTime
-        try? modelContext.save()
-        refreshTasks()
-    }
-
-    func move(task: Task, to index: Int) {
-        guard !task.isCompleted else { return }
-        var mutableTasks = tasks.filter { !$0.isCompleted }
-        mutableTasks.removeAll(where: { $0.id == task.id })
-        let clamped = max(0, min(index, mutableTasks.count))
-        mutableTasks.insert(task, at: clamped)
-        for (i, t) in mutableTasks.enumerated() {
-            t.displayOrder = i
-        }
-        try? modelContext.save()
-        refreshTasks()
-    }
-
-    func swapTasks(_ a: Task, with b: Task) {
-        let tmp = a.displayOrder
-        a.displayOrder = b.displayOrder
-        b.displayOrder = tmp
-        try? modelContext.save()
-        refreshTasks()
+        task.targetTime = sanitizedTarget(targetTime)
+        saveChanges()
     }
 
     func reorderTasks(_ orderedTasks: [Task]) {
-        for (index, task) in orderedTasks.enumerated() where !task.isCompleted {
+        for (index, task) in orderedTasks.enumerated() {
             task.displayOrder = index
         }
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
+    }
+
+    /// Stops stale running work at its local midnight and preserves exact elapsed time.
+    func reconcileDayBoundary(at date: Date) {
+        let today = LocalDay(date: date)
+        var changed = false
+        for task in tasks where task.isRunning {
+            let scheduledDay = task.scheduledDayKey.flatMap(LocalDay.init(key:)) ?? today
+            guard scheduledDay != today else { continue }
+
+            if scheduledDay < today {
+                let cutoff = min(date, scheduledDay.nextStartDate())
+                task.accumulatedElapsed = task.currentElapsed(at: cutoff)
+            }
+            task.isRunning = false
+            task.startedAt = nil
+            changed = true
+        }
+        guard changed else { return }
+        saveChanges()
     }
 
     func clearAllData() {
@@ -176,15 +157,72 @@ final class TimerManager: TimerManagerProtocol {
                 modelContext.delete(day)
             }
         }
-        try? modelContext.save()
-        refreshTasks()
+        saveChanges()
     }
 
     func refreshTasks() {
-        startDisplayTimer()
         let descriptor = FetchDescriptor<Task>(sortBy: [SortDescriptor(\.displayOrder)])
-        if let results = try? modelContext.fetch(descriptor) {
+        do {
+            let results = try modelContext.fetch(descriptor)
             tasks = results
+        } catch {
+            errorMessage = "FocusStation couldn’t load your saved tasks."
         }
+    }
+
+    func clearError() {
+        errorMessage = nil
+    }
+
+    /// Pauses every active task in one persistence transaction, used before sleep.
+    func pauseAllRunningTasks() {
+        var changed = false
+        for task in tasks where task.isRunning {
+            task.accumulatedElapsed = task.currentElapsed()
+            task.isRunning = false
+            task.startedAt = nil
+            changed = true
+        }
+        guard changed else { return }
+        saveChanges()
+    }
+
+    private func migrateLegacyTasksIfNeeded() {
+        let today = LocalDay.today
+        var changed = false
+        for task in tasks where task.scheduledDayKey == nil {
+            let destination: LocalDay
+            if
+                task.isRunning,
+                let startedAt = task.startedAt,
+                LocalDay(date: startedAt) < today
+            {
+                destination = LocalDay(date: startedAt)
+            } else if task.isCompleted {
+                destination = LocalDay(date: task.createdAt)
+            } else {
+                destination = today
+            }
+            task.scheduledDayKey = destination.key
+            changed = true
+        }
+        guard changed else { return }
+        saveChanges()
+    }
+
+    private func saveChanges() {
+        do {
+            try modelContext.save()
+            errorMessage = nil
+        } catch {
+            modelContext.rollback()
+            errorMessage = "FocusStation couldn’t save that change. Your previously saved data is unchanged."
+        }
+        refreshTasks()
+    }
+
+    private func sanitizedTarget(_ targetTime: TimeInterval?) -> TimeInterval? {
+        guard let targetTime, targetTime.isFinite, targetTime > 0 else { return nil }
+        return targetTime
     }
 }

@@ -18,11 +18,17 @@ extension TimerManager {
         )
     }
 
+    /// Stop observing workspace notifications before the service is released.
+    func stopObservingSleepWake() {
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
+    }
+
     @objc private func handleSleep() {
-        stopDisplayTimer()
+        pauseAllRunningTasks()
     }
 
     @objc private func handleWake() {
-        startDisplayTimer()
+        refreshTasks()
+        reconcileDayBoundary(at: .now)
     }
 }
